@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kawalama.lk - EXIF Viewer</title>
+    
+    <link rel="shortcut icon" href="https://i.ibb.co/TDLXdKLh/Untitled-design-1.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/piexifjs/1.0.6/piexif.js"></script>
+
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <style>
+        /* --- GREEN/BLUE THEME VARIABLES --- */
+        :root {
+            /* Light Mode */
+            --logo-accent: #3b82f6; /* Emerald Green */
+            --brand-text-color: #1e293b;; /* Teal */
+            
+            /* Fresh Blue/Green Gradient Background */
+            --bg-gradient: linear-gradient(-45deg, #ecfdf5, #f0f9ff, #ccfbf1, #d1fae5);
+            
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #064e3b; /* Dark Green Text */
+            --text-muted: #0d9488; /* Teal Muted */
+            --border-color: rgba(13, 148, 136, 0.2);
+            --input-bg: #f0fdf4;
+            
+            /* Buttons */
+            /* Main: Blue to Teal */
+            --btn-grad-main: linear-gradient(45deg, #0284c7, #0891b2, #0d9488);
+            /* Clean: Emerald to Green */
+            --btn-grad-clean: linear-gradient(45deg, #059669, #10b981, #34d399); 
+            /* Map: Indigo to Blue */
+            --btn-grad-map: linear-gradient(45deg, #4f46e5, #3b82f6, #0ea5e9);
+            
+            --btn-text: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode */
+            --bg-gradient: linear-gradient(-45deg, #022c22, #064e3b, #0f172a, #134e4a);
+            
+            --card-bg: rgba(6, 20, 25, 0.85); 
+            --brand-text-color: #ffffff; 
+            --text-main: #e0f2fe; /* Light Blue Text */
+            --text-muted: #5eead4; /* Teal Bright */
+            --border-color: rgba(45, 212, 191, 0.25);
+            --input-bg: rgba(15, 23, 42, 0.6);
+            
+            /* Dark Mode Gradients */
+            --btn-grad-main: linear-gradient(45deg, #0e7490, #0891b2, #2dd4bf);
+            --btn-grad-clean: linear-gradient(45deg, #047857, #10b981, #34d399);
+            --btn-grad-map: linear-gradient(45deg, #1e40af, #2563eb, #38bdf8);
+            
+            --btn-text: #ffffff;
+        }
+
+        /* --- LAYOUT --- */
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite; 
+            color: var(--text-main);
+            display: flex; flex-direction: column; min-height: 100vh;
+            margin: 0; padding: 0; 
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .page-wrapper {
+            flex: 1; display: flex; justify-content: center; align-items: flex-start;
+            padding: 20px; width: 100%; position: relative; z-index: 1;
+            padding-top: 100px; 
+        }
+
+        .container-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            padding: 2.5rem; border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+            width: 100%; max-width: 900px;
+            text-align: center; border: 1px solid var(--border-color);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- HEADER --- */
+        .site-branding { position: absolute; top: 25px; left: 25px; z-index: 100; text-align: left; }
+        .brand-text h1 { font-size: 24px; font-weight: 800; margin: 0; color: var(--brand-text-color); }
+        .brand-text span { color: var(--logo-accent); }
+        .subtitle { font-size: 13px; color: var(--text-muted); opacity: 0.8; }
+        .site-branding a { text-decoration: none; }
+
+        .theme-toggle {
+            position: absolute; top: 25px; right: 25px;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-main); z-index: 100;
+        }
+
+        /* --- UPLOAD AREA --- */
+        .dropzone {
+            border: 2px dashed var(--border-color);
+            border-radius: 20px; padding: 50px 20px;
+            background: var(--input-bg); cursor: pointer;
+            transition: all 0.3s ease; margin-bottom: 20px;
+        }
+        .dropzone:hover { border-color: #2dd4bf; transform: scale(1.02); background: rgba(45, 212, 191, 0.1); }
+        
+        /* --- RESULTS GRID --- */
+        #results-view { display: none; text-align: left; }
+        
+        .preview-container {
+            display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 30px;
+            align-items: flex-start;
+        }
+        
+        .image-preview-box {
+            flex: 1; min-width: 250px;
+            background: var(--input-bg); padding: 10px; border-radius: 16px; border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .image-preview-box img { max-width: 100%; border-radius: 10px; max-height: 400px; object-fit: contain; }
+
+        .meta-data-box {
+            flex: 2; min-width: 300px;
+        }
+
+        /* Metadata Sections */
+        .meta-section { margin-bottom: 20px; }
+        .meta-section h4 { 
+            border-bottom: 1px solid var(--border-color); padding-bottom: 5px; 
+            margin-bottom: 10px; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;
+        }
+
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+        
+        .meta-item {
+            background: rgba(0,0,0,0.1); padding: 10px; border-radius: 8px;
+        }
+        .meta-label { font-size: 0.75rem; opacity: 0.7; display: block; margin-bottom: 3px; }
+        .meta-value { font-weight: 600; font-size: 0.95rem; word-break: break-word; }
+
+        /* --- BUTTONS --- */
+        .btn-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+        
+        button {
+            padding: 12px 20px; border: none; border-radius: 12px;
+            font-weight: 700; cursor: pointer; color: white;
+            display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: 0.5s;
+            background-size: 200% auto;
+        }
+
+        button:hover { 
+            background-position: right center; 
+            transform: translateY(-2px); 
+            filter: brightness(1.1); 
+        }
+
+        .btn-upload { background-image: var(--btn-grad-main); width: 100%; justify-content: center; padding: 15px; font-size: 1.1rem; }
+        .btn-clean { background-image: var(--btn-grad-clean); }
+        .btn-map { background-image: var(--btn-grad-map); }
+        .btn-reset { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); background-image: none; box-shadow: none; }
+        .btn-reset:hover { background: var(--border-color); color: var(--text-main); }
+
+        /* Mobile Fixes */
+        @media (max-width: 768px) {
+            .page-wrapper { padding-top: 120px; }
+            .preview-container { flex-direction: column; }
+            .image-preview-box, .meta-data-box { width: 100%; }
+        }
+        
+        footer { text-align: center; padding: 20px; font-size: 13px; color: var(--text-muted); margin-top: auto; opacity: 0.7; }
+    </style>
+</head>
+<body>
+
+    <div class="site-branding">
+        <a href="dashboard.html">
+            <div class="brand-text">
+                <h1>Kawalama<span>.lk</span></h1>
+                <div class="subtitle">EXIF Data Viewer</div>
+            </div>
+        </a>
+    </div>
+
+    <div id="themeToggle" class="theme-toggle">
+        <svg id="sunIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg id="moonIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </div>
+
+    <div class="page-wrapper">
+        <div class="container-card">
+            
+            <div id="upload-view">
+                <h2>Check Image Metadata</h2>
+                <p style="margin-bottom:30px; opacity: 0.8;">Upload a photo to see hidden EXIF data (GPS, Camera, Dates).</p>
+                
+                <input type="file" id="fileInput" accept="image/jpeg, image/png, image/jpg" style="display:none;">
+                
+                <div class="dropzone" id="dropzone">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-muted); margin-bottom:15px;"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <div style="font-weight:700; font-size:1.1rem;">Click or Drag Image Here</div>
+                </div>
+            </div>
+
+            <div id="results-view">
+                <div class="preview-container">
+                    <div class="image-preview-box">
+                        <img id="previewImg" src="" alt="Preview">
+                        <div style="margin-top:10px; font-size:0.8rem; opacity:0.7;" id="basicFileInfo"></div>
+                    </div>
+
+                    <div class="meta-data-box" id="metaContent">
+                        </div>
+                </div>
+
+                <div class="btn-container">
+                    <button class="btn-clean" id="cleanBtn" onclick="removeMetadata()">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download Clean Image (No EXIF)
+                    </button>
+
+                    <button class="btn-map" id="mapBtn" style="display:none;" onclick="openMap()">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                        Open GPS Location
+                    </button>
+
+                    <button class="btn-reset" onclick="location.reload()">Check Another</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Kawalama.lk - Privacy First Tool</p>
+    </footer>
+
+    <script>
+        // --- THEME LOGIC ---
+        const htmlEl = document.documentElement;
+        const toggleBtn = document.getElementById('themeToggle');
+        const moonIcon = document.getElementById('moonIcon');
+        const sunIcon = document.getElementById('sunIcon');
+
+        function updateIcons(theme) {
+            if(theme === 'dark') { moonIcon.style.display = 'none'; sunIcon.style.display = 'block'; } 
+            else { moonIcon.style.display = 'block'; sunIcon.style.display = 'none'; }
+        }
+        updateIcons(htmlEl.getAttribute('data-theme'));
+        toggleBtn.addEventListener('click', () => {
+            const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            htmlEl.setAttribute('data-theme', next); localStorage.setItem('theme', next); updateIcons(next);
+        });
+
+        // --- EXIF LOGIC ---
+        const fileInput = document.getElementById('fileInput');
+        const dropzone = document.getElementById('dropzone');
+        const uploadView = document.getElementById('upload-view');
+        const resultsView = document.getElementById('results-view');
+        const previewImg = document.getElementById('previewImg');
+        const metaContent = document.getElementById('metaContent');
+        const mapBtn = document.getElementById('mapBtn');
+        const basicFileInfo = document.getElementById('basicFileInfo');
+
+        let currentLat = null;
+        let currentLng = null;
+        let originalFileBase64 = null;
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => processImage(e.target.files[0]));
+
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = '#2dd4bf'; });
+        dropzone.addEventListener('dragleave', (e) => { e.preventDefault(); dropzone.style.borderColor = ''; });
+        dropzone.addEventListener('drop', (e) => { e.preventDefault(); processImage(e.dataTransfer.files[0]); });
+
+        function processImage(file) {
+            if (!file || !file.type.match(/image.*/)) { alert("Please upload an image file."); return; }
+
+            const sizeKB = (file.size / 1024).toFixed(2);
+            basicFileInfo.innerText = `${file.name} (${sizeKB} KB)`;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                originalFileBase64 = e.target.result;
+                
+                EXIF.getData(file, function() {
+                    displayMetadata(this);
+                    uploadView.style.display = 'none';
+                    resultsView.style.display = 'block';
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function displayMetadata(img) {
+            const allTags = EXIF.getAllTags(img);
+            let html = '';
+
+            // --- CAMERA ---
+            const make = EXIF.getTag(img, "Make") || "N/A";
+            const model = EXIF.getTag(img, "Model") || "N/A";
+            const software = EXIF.getTag(img, "Software") || "N/A";
+            
+            html += `<div class="meta-section"><h4>📷 Camera Equipment</h4><div class="meta-grid">`;
+            html += createMetaItem("Brand", make);
+            html += createMetaItem("Model", model);
+            html += createMetaItem("Software", software);
+            html += `</div></div>`;
+
+            // --- SETTINGS ---
+            const iso = EXIF.getTag(img, "ISOSpeedRatings") || "N/A";
+            const fStop = EXIF.getTag(img, "FNumber") ? `f/${EXIF.getTag(img, "FNumber")}` : "N/A";
+            const exposure = EXIF.getTag(img, "ExposureTime") ? `1/${Math.round(1/EXIF.getTag(img, "ExposureTime"))}s` : "N/A";
+            const date = EXIF.getTag(img, "DateTimeOriginal") || "N/A";
+            
+            html += `<div class="meta-section"><h4>⚙️ Shot Settings</h4><div class="meta-grid">`;
+            html += createMetaItem("Date Taken", date);
+            html += createMetaItem("ISO", iso);
+            html += createMetaItem("Aperture", fStop);
+            html += createMetaItem("Shutter", exposure);
+            html += `</div></div>`;
+
+            // --- GPS ---
+            const latRaw = EXIF.getTag(img, "GPSLatitude");
+            const lngRaw = EXIF.getTag(img, "GPSLongitude");
+
+            if (latRaw && lngRaw) {
+                currentLat = convertDMSToDD(latRaw, EXIF.getTag(img, "GPSLatitudeRef"));
+                currentLng = convertDMSToDD(lngRaw, EXIF.getTag(img, "GPSLongitudeRef"));
+                
+                html += `<div class="meta-section"><h4>📍 Location Data</h4><div class="meta-grid">`;
+                html += createMetaItem("Latitude", currentLat.toFixed(6));
+                html += createMetaItem("Longitude", currentLng.toFixed(6));
+                html += `</div></div>`;
+                
+                mapBtn.style.display = 'flex'; 
+            } else {
+                html += `<div class="meta-section"><h4>📍 Location Data</h4><p style="font-size:0.9rem; opacity:0.6;">No GPS data found in this image.</p></div>`;
+                mapBtn.style.display = 'none';
+            }
+
+            metaContent.innerHTML = html;
+        }
+
+        function createMetaItem(label, value) {
+            return `<div class="meta-item"><span class="meta-label">${label}</span><span class="meta-value">${value}</span></div>`;
+        }
+
+        function convertDMSToDD(dms, ref) {
+            let dd = dms[0] + dms[1]/60 + dms[2]/3600;
+            if (ref === "S" || ref === "W") dd = dd * -1;
+            return dd;
+        }
+
+        function openMap() {
+            if(currentLat && currentLng) {
+                window.open(`https://www.google.com/maps/search/?api=1&query=${currentLat},${currentLng}`, '_blank');
+            }
+        }
+
+        function removeMetadata() {
+            if(!originalFileBase64) return;
+            try {
+                const cleanData = piexif.remove(originalFileBase64);
+                const link = document.createElement("a");
+                link.download = "clean_image_kawalama.jpg";
+                link.href = cleanData;
+                link.click();
+            } catch (e) {
+                alert("Could not process this image type for cleaning (try JPG).");
+            }
+        }
+    </script>
+</body>
+</html>

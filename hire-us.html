@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hire Us - Kawalama.lk</title>
+    
+    <link rel="icon" sizes="any" href="data:,">    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --brand-blue: #3b82f6; 
+            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #d946ef 100%);
+            --glass-surface: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --input-bg: rgba(255, 255, 255, 0.5);
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --glow-color: rgba(139, 92, 246, 0.4);
+            
+            --bg-gradient-light: linear-gradient(-45deg, #e0c3fc, #a7d3ff, #d0a4fc, #f7b2d8);
+            --bg-color: #f0f4ff;
+
+            --footor1: rgba(30, 30, 31, 0.8);
+            --footor2: rgba(45, 18, 88, 0.9);
+            --footor3: #8d1450;
+        }
+
+        [data-theme="dark"] {
+            --glass-surface: rgba(15, 23, 42, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(30, 41, 59, 0.5);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --glow-color: rgba(139, 92, 246, 0.6);
+            
+            --bg-gradient-dark: linear-gradient(-45deg, #0f172a, #2e1065, #4c0519, #1e1b4b);
+            --bg-color: #0f172a;
+
+            --footor1: rgba(255, 255, 255, 0.8);
+            --footor2: #b164f8;
+            --footor3: #ec4899;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient-light);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            overflow-x: hidden;
+            padding-top: 80px; 
+            position: relative;
+        }
+
+        [data-theme="dark"] body {
+            background: var(--bg-gradient-dark);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
+        }
+
+        /* --- AMBIENT BLOBS --- */
+        .ambient-glow {
+            position: fixed; border-radius: 50%; filter: blur(100px); opacity: 0.4; z-index: -1; animation: floatGlow 15s infinite alternate;
+        }
+        .glow-1 { top: -10%; left: -10%; width: 700px; height: 700px; background: radial-gradient(circle, #d946ef, #8b5cf6); animation-duration: 20s; }
+        .glow-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, #3b82f6, #06b6d4); animation-duration: 18s; }
+        .glow-3 { top: 40%; left: 30%; width: 400px; height: 400px; background: radial-gradient(circle, #f43f5e, #a855f7); opacity: 0.3; animation-duration: 25s; }
+        @keyframes floatGlow { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+
+        /* --- HEADER --- */
+        .smart-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 80px; padding: 0 5%; 
+            display: flex; align-items: center; justify-content: space-between; z-index: 1000; transition: 0.4s;
+        }
+        .smart-header.scrolled {
+            background: rgba(var(--bg-color), 0.2); backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .smart-header.hidden { transform: translateY(-100%); }
+
+        .brand-text { text-decoration: none !important; } /* REMOVED UNDERLINE */
+        .brand-text:hover { text-decoration: none; }
+        .brand-text h1 { font-size: 24px; font-weight: 800; margin: 0; color: var(--text-main); }
+        .brand-text span { color: #3b82f6; } 
+        .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        .theme-toggle { width: 44px; height: 44px; border-radius: 50%; background: var(--glass-surface); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main); backdrop-filter: blur(5px); }
+
+        /* --- HERO SECTION --- */
+        .hire-hero {
+            text-align: center; padding: 80px 20px 60px;
+            max-width: 900px; margin: 0 auto;
+        }
+        .hero-title {
+            font-size: 3.5rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -1px;
+            background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero-desc { font-size: 1.2rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 30px; }
+
+        /* --- SERVICES GRID --- */
+        .services-section {
+            max-width: 1200px; margin: 0 auto 80px; padding: 0 20px;
+        }
+        .grid-container {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;
+        }
+        
+        .service-card {
+            background: var(--glass-surface); backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 35px;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden;
+        }
+        .service-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px -10px var(--glow-color); }
+        
+        /* Gradient Border Bottom Effect */
+        .service-card::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px;
+            background: var(--primary-gradient); transform: scaleX(0); transform-origin: left; transition: 0.4s;
+        }
+        .service-card:hover::after { transform: scaleX(1); }
+
+        .service-icon {
+            width: 60px; height: 60px; border-radius: 15px; margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+        }
+        .service-icon i { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .service-card h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 10px; }
+        .service-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* --- CONTACT & FORM SPLIT SECTION --- */
+        .form-section {
+            max-width: 1200px; margin: 0 auto 100px; padding: 0 20px;
+        }
+        
+        .section-header { margin-bottom: 40px; }
+        .section-header h2 { font-weight: 800; font-size: 2rem; color: var(--text-main); }
+
+        .split-layout {
+            display: grid; 
+            grid-template-columns: 1fr 1.5fr; /* Left: Info, Right: Form */
+            gap: 50px;
+            align-items: start;
+        }
+
+        /* Left Side: Contact Info */
+        .contact-info-box {
+            padding-right: 20px;
+        }
+        .contact-subtitle {
+            font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6;
+        }
+        
+        .info-item {
+            display: flex; align-items: center; margin-bottom: 25px;
+        }
+        .info-icon {
+            width: 50px; height: 50px; border-radius: 12px;
+            background: rgba(139, 92, 246, 0.1); 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; color: #8b5cf6; margin-right: 20px;
+            border: 1px solid var(--glass-border);
+        }
+        .info-text h5 { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+        .info-text p { margin: 0; font-weight: 600; font-size: 1.1rem; color: var(--text-main); }
+
+        .social-links { margin-top: 40px; }
+        .social-btn {
+            display: inline-flex; width: 45px; height: 45px;
+            align-items: center; justify-content: center;
+            background: var(--input-bg); border: 1px solid var(--glass-border);
+            border-radius: 10px; margin-right: 10px;
+            color: var(--text-main); transition: 0.3s; text-decoration: none;
+        }
+        .social-btn:hover { background: var(--primary-gradient); color: white; transform: translateY(-3px); }
+
+        /* Right Side: Glass Form */
+        .glass-form {
+            background: var(--glass-surface); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 30px; padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        
+        /* FIX: INPUT COLORS FOR DARK MODE */
+        .modern-input, .modern-select {
+            width: 100%; background: var(--input-bg);
+            border: 1px solid var(--glass-border); padding: 15px 20px;
+            border-radius: 12px; font-size: 1rem;
+            transition: 0.3s; margin-bottom: 20px;
+            
+            /* Text Color Fix */
+            color: var(--text-main); 
+        }
+        
+        /* Dropdown Options Fix */
+        .modern-select option {
+            background: #1e293b; /* Dark background for dropdown */
+            color: white;
+        }
+        [data-theme="light"] .modern-select option {
+            background: #ffffff;
+            color: #333;
+        }
+
+        .modern-input:focus, .modern-select:focus {
+            outline: none; background: rgba(var(--bg-color), 0.8);
+            border-color: #8b5cf6; box-shadow: 0 0 0 4px var(--glow-color);
+        }
+        
+        .gradient-btn {
+            width: 100%; padding: 18px; border: none; border-radius: 15px;
+            background: var(--primary-gradient); background-size: 200% auto;
+            color: white; font-weight: 700; font-size: 1.1rem;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 10px 30px -10px var(--glow-color);
+        }
+        .gradient-btn:hover { background-position: right center; transform: translateY(-2px); box-shadow: 0 15px 35px -10px var(--glow-color); }
+
+        /* --- FOOTER --- */
+        .modern-footer {
+            margin-top: auto; padding: 30px 0; text-align: center;
+            border-top: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.2); backdrop-filter: blur(10px);
+            font-size: 0.9rem; color: var(--footor1);
+        }
+        .footer-links { margin-top: 15px; }
+        .footer-links a { margin: 0 15px; color: var(--footor2); text-decoration: none; transition: 0.2s; }
+        .footer-links a:hover { color: var(--footor3); }
+
+        @media (max-width: 900px) {
+            .split-layout { grid-template-columns: 1fr; gap: 40px; }
+            .hero-title { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <header class="smart-header" id="mainHeader">
+        <a href="home.html" class="brand-text">
+            <h1>Kawalama<span>.lk</span></h1>
+            <div class="subtitle">All-in-One Toolkit</div>
+        </a>
+        <div id="themeToggle" class="theme-toggle"><i class="fas fa-moon"></i></div>
+    </header>
+
+    <div class="hire-hero">
+        <h1 class="hero-title">Transform Your Digital Presence</h1>
+        <p class="hero-desc">
+            Kawalama.lk is on a mission to help you bring your ideas to life. From creating comprehensive digital solutions to simple tools, we do it all.
+            We specialize in crafting scalable web applications, React Native mobile apps, and visually appealing sites optimized for SEO and performance.
+            Let's build something extraordinary together.
+        </p>
+    </div>
+
+    <div class="services-section">
+        <div class="grid-container">
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-code"></i></div>
+                <h3>Web Development</h3>
+                <p>Modern, responsive, and fast websites built with React, Node.js, and cutting-edge technologies. We specialize in creating scalable web applications and e-commerce platforms ensuring your online presence is robust and effective.</p>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-mobile-alt"></i></div>
+                <h3>Mobile Apps</h3>
+                <p>Cross-platform mobile applications for iOS and Android using frameworks like Flutter and React Native. We deliver smooth user experiences, robust functionality, and intuitive designs that keep your users engaged.</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-layer-group"></i></div>
+                <h3>UI/UX Design</h3>
+                <p>Stunning interfaces and intuitive user experiences are at the core of our design philosophy. We conduct thorough user research and create wireframes that users love to interact with, enhancing brand loyalty.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="section-header">
+            <h2>Get in Touch & Start Your Project</h2>
+        </div>
+
+        <div class="split-layout">
+            
+            <div class="contact-info-box">
+                <div class="contact-subtitle">
+                    We're here to help you bring your ideas to life. Reach out to us for inquiries, collaborations, or just to say hello. Our team is ready to assist you.
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="info-text">
+                        <h5>Email:</h5>
+                        <p>contact@kawalama.lk</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
+                    <div class="info-text">
+                        <h5>Phone:</h5>
+                        <p>+94 70 370 4224</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="info-text">
+                        <h5>Address:</h5>
+                        <p>Galle, Sri Lanka.</p>
+                    </div>
+                </div>
+
+                <div class="social-links">
+                    <a href="#" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                </div>
+            </div>
+
+            <div class="glass-form">
+                <form id="hireForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="text" class="modern-input" placeholder="Your Name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="email" class="modern-input" placeholder="Your Email" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select class="modern-select">
+                                <option value="" disabled selected>Service Interested In</option>
+                                <option>Web Development</option>
+                                <option>Mobile App</option>
+                                <option>UI/UX Design</option>
+                                <option>Custom Software</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select class="modern-select">
+                                <option value="" disabled selected>Estimated Budget</option>
+                                <option>10,000LKR - 25,000LKR</option>
+                                <option>25,000LKR - 50,000LKR</option>
+                                <option>50,000LKR +</option>
+                                <option>Not sure yet</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <textarea class="modern-input" rows="5" placeholder="Tell us about your project details..." required></textarea>
+
+                    <button type="submit" class="gradient-btn" id="submitBtn">
+                        Submit Proposal <i class="fas fa-rocket" style="margin-left: 8px;"></i>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="modern-footer">
+        <div class="container">
+            <p>© 2025 Kawalama.lk. Developed by The Two Zero By Kasun Dilshan</p>
+            <div class="footer-links">
+                <a href="home.html">Home</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Use</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const htmlEl = document.documentElement;
+        const toggleBtn = document.getElementById('themeToggle');
+        toggleBtn.addEventListener('click', () => {
+            const current = htmlEl.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            htmlEl.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        });
+
+        // Header Scroll Logic (Hide on Scroll Down)
+        let lastScrollTop = 0;
+        const header = document.getElementById('mainHeader');
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if(scrollTop > lastScrollTop){ header.classList.add('hidden'); }
+            else { header.classList.remove('hidden'); header.classList.add('scrolled'); }
+            if(scrollTop <= 0) header.classList.remove('scrolled');
+            lastScrollTop = scrollTop;
+        });
+
+        // Form Animation
+        const form = document.getElementById('hireForm');
+        const btn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+            btn.style.opacity = '0.8';
+            
+            setTimeout(() => {
+                btn.innerHTML = 'Proposal Sent! <i class="fas fa-check"></i>';
+                btn.style.background = '#10b981'; // Success Green
+                form.reset();
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.style.background = '';
+                    btn.style.opacity = '1';
+                }, 3000);
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

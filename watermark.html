@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kawalama.lk - PDF Watermark</title>
+    
+    <link rel="shortcut icon" href="https://i.ibb.co/hbh1Hry/Untitled-design-9.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/downloadjs@1.4.7/download.min.js"></script>
+
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <style>
+        /* --- ROSE & VIOLET THEME VARIABLES --- */
+        :root {
+            --brand-blue: #3b82f6; 
+            --theme-accent: #db2777; /* Pink Rose */
+            --theme-secondary: #9333ea; /* Purple */
+            --logo-color: #1e293b;
+
+            /* Light Mode */
+            --bg-gradient: linear-gradient(-45deg, #fae8f2, #f8d2e8, #e9dafa, #ffffff);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #b425c7; /* Dark Pink Text */
+            --text-muted: #5a5759; /* Pink Muted */
+            --border-color: rgba(219, 39, 119, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --input-bg: rgba(255, 255, 255, 0.8);
+            
+            /* Rose-Purple Gradient Button */
+            --btn-grad: linear-gradient(135deg, #db2777, #9333ea, #ec4899);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode */
+            --logo-color: #f8fafc; 
+            --bg-gradient: linear-gradient(-45deg, #1f0510, #380826, #1e1b4b, #2e1065);
+            --card-bg: rgba(45, 10, 30, 0.5); /* Dark Plum Glass */
+            --text-main: #fce7f3;
+            --text-muted: #c5c3c4;
+            --border-color: rgba(236, 72, 153, 0.25);
+            --glass-bg: rgba(80, 7, 36, 0.3);
+            --input-bg: rgba(0, 0, 0, 0.3);
+            
+            /* Neon Pink-Purple Gradient */
+            --btn-grad: linear-gradient(135deg, #be185d, #9333ea, #db2777);
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            color: var(--text-main);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            padding-top: 120px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- SMART HEADER --- */
+        .smart-header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            height: 80px;
+            padding: 0 30px;
+            display: flex; align-items: center; justify-content: space-between;
+            z-index: 1000;
+            transition: transform 0.4s ease-in-out, background 0.3s;
+            background: transparent;
+        }
+
+        .smart-header.scrolled {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .smart-header.hidden { transform: translateY(-100%); }
+
+        .site-branding a { text-decoration: none; color: inherit; }
+        .brand-text h1 { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: var(--logo-color); }
+        .brand-text span { color: var(--brand-blue); }
+        .subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
+
+        .theme-toggle {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--card-bg); backdrop-filter: blur(5px);
+            border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-main);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .theme-toggle:hover { transform: scale(1.1); border-color: var(--theme-accent); }
+        .theme-toggle svg { width: 22px; height: 22px; }
+
+        /* --- MAIN CARD --- */
+        .container-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 3rem; border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+            width: 100%; max-width: 600px;
+            text-align: center; border: 1px solid var(--border-color);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .container-card h2 { margin-top: 0; margin-bottom: 10px; font-size: 1.8rem; font-weight: 700; }
+        .container-card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 30px; }
+
+        /* --- UPLOAD BOX --- */
+        .upload-wrapper { position: relative; margin-bottom: 25px; }
+        .upload-box {
+            background: var(--glass-bg); border: 2px dashed var(--border-color);
+            border-radius: 16px; padding: 30px; cursor: pointer;
+            transition: 0.3s; position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .upload-box:hover { border-color: var(--theme-accent); background: rgba(219, 39, 119, 0.05); }
+        .upload-icon { font-size: 2.5rem; color: var(--theme-accent); margin-bottom: 10px; }
+        .file-name { font-weight: 600; color: var(--text-main); margin-top: 5px; }
+        #pdfInput { display: none; }
+        
+        .clear-btn {
+            position: absolute; top: 10px; right: 10px;
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted);
+            display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 10;
+        }
+        .clear-btn:hover { background: var(--theme-accent); color: white; }
+
+        /* --- CONTROLS --- */
+        .controls-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+            margin-bottom: 25px; text-align: left;
+            opacity: 0.5; pointer-events: none; transition: 0.3s;
+        }
+        .controls-grid.active { opacity: 1; pointer-events: all; }
+
+        .control-group { margin-bottom: 5px; }
+        label { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }
+        
+        .percent-badge {
+            background: var(--theme-accent); color: white; 
+            padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%; padding: 12px; border-radius: 8px;
+            border: 1px solid var(--border-color); background: var(--input-bg);
+            color: var(--text-main); outline: none; transition: 0.2s;
+        }
+        input:focus { border-color: var(--theme-accent); box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.2); }
+        
+        input[type="color"] { width: 100%; height: 45px; border: none; background: transparent; cursor: pointer; }
+        input[type="range"] { width: 100%; accent-color: var(--theme-accent); }
+
+        button.main-btn {
+            width: 100%; padding: 16px; background-image: var(--btn-grad);
+            background-size: 200% auto; animation: gradientShift 3s ease infinite;
+            color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(219, 39, 119, 0.4); opacity: 0.5; cursor: not-allowed;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        button.main-btn.ready { opacity: 1; cursor: pointer; }
+        button.main-btn:hover.ready { transform: translateY(-3px); }
+
+        .loader {
+            display: none; width: 20px; height: 20px;
+            border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white;
+            border-radius: 50%; animation: spin 1s linear infinite; margin-left: 10px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .site-footer {
+            margin-top: auto; padding: 30px 20px 10px 20px;
+            text-align: center; font-size: 0.85rem; color: var(--text-muted);
+            font-weight: 500; opacity: 0.8; letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .smart-header { padding: 0 20px; height: 70px; }
+            .container-card { padding: 2rem 1.5rem; }
+            .controls-grid { grid-template-columns: 1fr; }
+            .control-group[style*="span 2"] { grid-column: span 1 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="smart-header" id="mainHeader">
+        <div class="site-branding">
+            <a href="dashboard.html">
+                <div class="brand-text">
+                    <h1>Kawalama<span>.lk</span></h1>
+                    <div class="subtitle">PDF Watermark Generator</div>
+                </div>
+            </a>
+        </div>
+
+        <div id="themeToggle" class="theme-toggle" aria-label="Switch Theme">
+            <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </div>
+    </header>
+
+    <div class="container-card">
+        <h2>Add Watermark</h2>
+        <p>Secure your documents instantly in the browser.</p>
+
+        <div class="upload-wrapper">
+            <div class="clear-btn" id="clearBtn" onclick="clearFile(event)">✕</div>
+            <div class="upload-box" onclick="document.getElementById('pdfInput').click()">
+                <input type="file" id="pdfInput" accept="application/pdf" onchange="handleFileSelect(this)">
+                <div class="upload-icon">📄</div>
+                <div class="file-name" id="fileName">Click to Upload PDF</div>
+            </div>
+        </div>
+
+        <div class="controls-grid" id="controls">
+            <div class="control-group" style="grid-column: span 2;">
+                <label>Watermark Text</label>
+                <input type="text" id="wmText" value="CONFIDENTIAL" placeholder="Enter text...">
+            </div>
+            
+            <div class="control-group">
+                <label>Font Size</label>
+                <input type="number" id="wmSize" value="50">
+            </div>
+
+            <div class="control-group">
+                <label>Color</label>
+                <input type="color" id="wmColor" value="#db2777">
+            </div>
+
+            <div class="control-group" style="grid-column: span 2;">
+                <label>Opacity <span class="percent-badge" id="opacityValue">30%</span></label>
+                <input type="range" id="wmOpacity" min="0.1" max="1" step="0.1" value="0.3">
+            </div>
+        </div>
+
+        <button class="main-btn" id="processBtn" onclick="generateWatermark()" disabled>
+            <span>Download Watermarked PDF</span>
+            <div class="loader" id="loader"></div>
+        </button>
+    </div>
+
+    <footer class="site-footer">
+        kawalama.lk - PDF watermark tool
+    </footer>
+
+    <script>
+        // --- SMART HEADER SCROLL ---
+        let lastScrollTop = 0;
+        const header = document.getElementById('mainHeader');
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > lastScrollTop) { header.classList.add('hidden'); } 
+            else { header.classList.remove('hidden'); header.classList.add('scrolled'); }
+            if (scrollTop <= 0) { header.classList.remove('scrolled'); header.classList.remove('hidden'); }
+            lastScrollTop = scrollTop;
+        });
+
+        // --- THEME TOGGLE ---
+        const htmlEl = document.documentElement;
+        const toggleBtn = document.getElementById('themeToggle');
+        const moonIcon = document.getElementById('moonIcon');
+        const sunIcon = document.getElementById('sunIcon');
+
+        function updateIcons(theme) {
+            if(theme === 'dark') { moonIcon.style.display = 'none'; sunIcon.style.display = 'block'; } 
+            else { moonIcon.style.display = 'block'; sunIcon.style.display = 'none'; }
+        }
+        updateIcons(htmlEl.getAttribute('data-theme'));
+
+        toggleBtn.addEventListener('click', () => {
+            const current = htmlEl.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            htmlEl.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateIcons(next);
+        });
+
+        // --- OPACITY % LOGIC ---
+        const opacityInput = document.getElementById('wmOpacity');
+        const opacityValue = document.getElementById('opacityValue');
+        opacityInput.addEventListener('input', (e) => {
+            const val = Math.round(e.target.value * 100);
+            opacityValue.innerText = val + "%";
+        });
+
+        // --- PDF LOGIC ---
+        let currentFileArrayBuffer = null;
+        const controls = document.getElementById('controls');
+        const processBtn = document.getElementById('processBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const fileNameDisplay = document.getElementById('fileName');
+        const pdfInput = document.getElementById('pdfInput');
+
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (file.type !== 'application/pdf') { alert("Please select a PDF file."); return; }
+                fileNameDisplay.innerText = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentFileArrayBuffer = e.target.result;
+                    controls.classList.add('active');
+                    processBtn.classList.add('ready');
+                    processBtn.disabled = false;
+                    clearBtn.style.display = 'flex';
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        function clearFile(e) {
+            e.stopPropagation();
+            pdfInput.value = '';
+            currentFileArrayBuffer = null;
+            fileNameDisplay.innerText = "Click to Upload PDF";
+            controls.classList.remove('active');
+            processBtn.classList.remove('ready');
+            processBtn.disabled = true;
+            clearBtn.style.display = 'none';
+        }
+
+        async function generateWatermark() {
+            if (!currentFileArrayBuffer) return;
+            const loader = document.getElementById('loader');
+            const btnSpan = processBtn.querySelector('span');
+            loader.style.display = 'inline-block';
+            btnSpan.style.display = 'none';
+            
+            try {
+                const pdfDoc = await PDFLib.PDFDocument.load(currentFileArrayBuffer);
+                const pages = pdfDoc.getPages();
+                
+                const text = document.getElementById('wmText').value;
+                const size = parseInt(document.getElementById('wmSize').value);
+                const opacity = parseFloat(document.getElementById('wmOpacity').value);
+                const hexColor = document.getElementById('wmColor').value;
+                
+                const r = parseInt(hexColor.substr(1, 2), 16) / 255;
+                const g = parseInt(hexColor.substr(3, 2), 16) / 255;
+                const b = parseInt(hexColor.substr(5, 2), 16) / 255;
+                const color = PDFLib.rgb(r, g, b);
+
+                const font = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+
+                pages.forEach(page => {
+                    const { width, height } = page.getSize();
+                    const textWidth = font.widthOfTextAtSize(text, size);
+                    const textHeight = font.heightAtSize(size);
+
+                    page.drawText(text, {
+                        x: width / 2 - textWidth / 2,
+                        y: height / 2,
+                        size: size,
+                        font: font,
+                        color: color,
+                        opacity: opacity,
+                        rotate: PDFLib.degrees(-45),
+                    });
+                });
+
+                const pdfBytes = await pdfDoc.save();
+                download(pdfBytes, "kawalama-watermarked.pdf", "application/pdf");
+
+            } catch (error) {
+                console.error(error);
+                alert("Error processing PDF.");
+            } finally {
+                loader.style.display = 'none';
+                btnSpan.style.display = 'inline';
+            }
+        }
+    </script>
+
+</body>
+</html>

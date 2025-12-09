@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Kawalama.lk</title>
+    
+  <link rel="icon" sizes="any" href="data:,">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <style>
+        /* --- MODERN VIBRANT VARIABLES --- */
+        :root {
+            --brand-blue: #3b82f6; 
+            --theme-accent: #d946ef; 
+            --logo-color: #1e293b;
+
+            /* Light Mode Background Gradient */
+            --bg-gradient-light: linear-gradient(-45deg, #e0c3fc, #a7d3ff, #d0a4fc, #f7b2d8);
+            
+            /* Glass Variables */
+            --glass-surface: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --sub-color: #4d4e4e;
+            
+            --icon-gradient: linear-gradient(45deg, #3b82f6, #a855f7, #ec4899); 
+            
+            --footor1: rgba(30, 30, 31, 0.8);
+            --footor2: rgba(45, 43, 51, 0.9);
+            --footor3: #8d1450;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode Background Gradient */
+            --bg-gradient-dark: linear-gradient(-45deg, #0f172a, #2e1065, #4c0519, #1e1b4b);
+
+            /* Glass Variables (Dark) */
+            --glass-surface: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.3);
+
+            --logo-color: #f8fafc; 
+            --text-main: #f1f5f9; 
+            --text-muted: #9fa9b8;
+            --sub-color: #c2c1c1;
+
+            --icon-gradient: linear-gradient(45deg, #0ea5e9, #8b5cf6, #f43f5e); 
+
+            --footor1: rgba(255, 255, 255, 0.8);
+            --footor2: #9888b9;
+            --footor3: #ec4899;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            
+            /* --- FIXED GRADIENT ANIMATION --- */
+            background: var(--bg-gradient-light);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            padding-top: 80px; 
+            position: relative; 
+        }
+
+        [data-theme="dark"] body {
+            background: var(--bg-gradient-dark);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        /* --- THE ANIMATION KEYFRAMES --- */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- AMBIENT BLOBS --- */
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            z-index: -1;
+            animation: floatGlow 15s infinite alternate;
+        }
+        .glow-1 {
+            top: -10%; left: -10%; width: 700px; height: 700px;
+            background: radial-gradient(circle, #d946ef, #8b5cf6);
+            animation-duration: 20s;
+        }
+        .glow-2 {
+            bottom: -10%; right: -10%; width: 600px; height: 600px;
+            background: radial-gradient(circle, #3b82f6, #06b6d4);
+            animation-duration: 18s;
+        }
+        .glow-3 {
+            top: 40%; left: 30%; width: 400px; height: 400px;
+            background: radial-gradient(circle, #f43f5e, #a855f7);
+            opacity: 0.3;
+            animation-duration: 25s;
+        }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        /* --- SMART HEADER --- */
+        .smart-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 80px;
+            padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
+            z-index: 1000; transition: 0.4s;
+        }
+        .smart-header.scrolled {
+            background: rgba(var(--bg-color), 0.2); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .smart-header.hidden { transform: translateY(-100%); }
+
+        .brand-text { text-decoration: none; }
+        .brand-text h1 { font-size: 24px; font-weight: 800; margin: 0; color: var(--logo-color); }
+        
+        /* --- FIXED: LOGO .LK IS BLUE --- */
+        .brand-text span { 
+            color: #3b82f6; /* Solid Blue Color */
+        }
+        
+        .subtitle { font-size: 13px; color: var(--sub-color); font-weight: 500; text-decoration: none;}
+
+        .theme-toggle {
+            width: 44px; height: 44px; border-radius: 50%; 
+            background: var(--glass-surface); 
+            border: 1px solid var(--glass-border); 
+            backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-main);
+        }
+
+        /* --- CAROUSEL SECTION --- */
+        .carousel-container {
+            margin: 20px auto 40px;
+            max-width: 1400px;
+            width: 95%;
+            border-radius: 24px; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .carousel-item img {
+            height: 450px; object-fit: cover; 
+            filter: brightness(0.6); 
+        }
+        .carousel-caption h3 { font-weight: 800; font-size: 2.5rem; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .carousel-caption p { font-size: 1.1rem; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        
+        /* --- 3D FLIP CARD GRID --- */
+        .tools-section { 
+            margin: 0 45px 80px 45px;
+            width: auto; 
+        }
+
+        .section-header-group {
+            text-align: center;
+            margin-bottom: 50px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-title { 
+            font-weight: 800; 
+            margin-bottom: 15px; 
+            font-size: 2.5rem; 
+            background: linear-gradient(to right, #fff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        [data-theme="light"] .section-title {
+            background: linear-gradient(to right, #1e293b, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-intro {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .tools-grid {
+            display: grid;
+            width: 100%;
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 20px; 
+        }
+
+        @media (min-width: 992px) {
+            .tools-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 30px;
+            }
+        }
+
+        .flip-card {
+            background-color: transparent;
+            height: 300px; 
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative; width: 100%; height: 100%;
+            text-align: center; transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            border-radius: 20px; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+
+        /* --- GLASS EFFECT APPLIED TO CARDS --- */
+        .flip-card-front {
+            background: var(--glass-surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+        }
+        
+        .tool-icon { 
+            font-size: 3.5rem; 
+            margin-bottom: 20px; 
+            background: var(--icon-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .tool-name { font-weight: 700; font-size: 1.1rem; }
+
+        /* Back Side */
+        .flip-card-back {
+            background: var(--icon-gradient); 
+            color: white; transform: rotateY(180deg);
+            text-align: left; align-items: flex-start;
+        }
+
+        .flip-card-back h4 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; width: 100%; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px;}
+        .flip-card-back ul { padding-left: 15px; margin: 0; font-size: 0.8rem; line-height: 1.5; }
+        .flip-card-back li { margin-bottom: 3px; }
+        
+        .cta-btn {
+            margin-top: auto; align-self: center;
+            background: white; color: #8b5cf6;
+            padding: 6px 16px; border-radius: 20px;
+            text-decoration: none; font-weight: 700; font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .cta-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); color: #ec4899; }
+
+        /* --- MOBILE SPECIFIC ADJUSTMENTS --- */
+        @media (max-width: 768px) {
+            .tools-section { margin: 0 20px 60px 20px; }
+            .carousel-item img { height: 250px; }
+            .carousel-caption h3 { font-size: 1.5rem; }
+            .section-title { font-size: 1.8rem; }
+            .flip-card { height: 220px; } 
+            .tool-icon { font-size: 2.5rem; margin-bottom: 10px; }
+            .tool-name { font-size: 0.95rem; }
+            .flip-card-front, .flip-card-back { padding: 10px; }
+            .flip-card-back ul { display: none; } 
+            .flip-card-back .cta-btn { margin-top: 0; }
+        }
+
+        /* --- DEVELOPER SECTION (GLASS EFFECT) --- */
+        .dev-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 60px 20px; text-align: center;
+            margin-top: 60px;
+            border-top: 1px solid var(--glass-border);
+        }
+        .dev-card {
+            background: var(--glass-surface);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            display: inline-block; padding: 40px;
+            border-radius: 24px; max-width: 600px; width: 100%;
+            box-shadow: var(--card-shadow);
+        }
+        .dev-img {
+            width: 120px; height: 120px; border-radius: 50%;
+            object-fit: cover; border: 4px solid #ec4899;
+            margin-bottom: 20px;
+        }
+        .dev-name { font-size: 1.8rem; font-weight: 800; margin: 0; }
+        .dev-role { color: var(--text-muted); font-size: 1rem; margin-bottom: 20px; font-weight: 500; }
+        .dev-socials a {
+            color: var(--text-main); font-size: 1.5rem; margin: 0 10px; transition: 0.2s;
+        }
+        .dev-socials a:hover { 
+            background: var(--icon-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transform: translateY(-3px); display: inline-block;
+        }
+
+        /* --- FOOTER --- */
+        .simple-footer {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            margin-top: auto;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            font-size: 0.9rem;
+            color: var(--footor1)
+        }
+        .footer-links { margin-top: 10px; }
+        .footer-links a { color: var(--footor2); text-decoration: none; margin: 0 10px; transition: 0.3s;}
+        .footer-links a:hover { color: #bd24a8;}
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <header class="smart-header" id="mainHeader">
+        <a href="home.html" class="brand-text">
+            <h1>Kawalama<span>.lk</span></h1>
+            <div class="subtitle">All-in-One Toolkit</div>
+        </a>
+
+        <div id="themeToggle" class="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </div>
+    </header>
+
+    <div class="container-fluid">
+        <div id="heroCarousel" class="carousel slide carousel-container" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"></button>
+            </div>
+            
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop" class="d-block w-100" alt="Abstract Design">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>Design Made Simple</h3>
+                        <p>Extract palettes and edit visuals in seconds.</p>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070&auto=format&fit=crop" class="d-block w-100" alt="Coding">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>Built for Developers</h3>
+                        <p>Streamline your workflow with instant code helpers.</p>
+                    </div>
+                </div>
+                
+                <div class="carousel-item ">
+                    <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop" class="d-block w-100" alt="Global Network">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>Secure & Private Tools</h3>
+                        <p>Advanced utilities running locally on your device.</p>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=2070&auto=format&fit=crop" class="d-block w-100" alt="Cyber Security">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>Anonymous & Safe</h3>
+                        <p>No logs. No tracking. Pure utility.</p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+    </div>
+
+    <div class="tools-section">
+        
+        <div class="section-header-group">
+            <h2 class="section-title">Our Tools Ecosystem</h2>
+            <p class="section-intro">
+                Welcome to Kawalama.lk, your all-in-one digital Swiss Army knife. 
+                We provide free, privacy-first utilities designed to help students, developers, and creators 
+                solve everyday problems—fast, secure, and completely local.
+            </p>
+        </div>
+        
+        <div class="tools-grid">
+            
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <i class="fas fa-qrcode tool-icon"></i>
+                        <div class="tool-name">QR Generator</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h4>Why use this?</h4>
+                        <ul>
+                            <li>Instant Generation</li>
+                            <li>High Resolution PNG</li>
+                            <li>History Log saved locally</li>
+                        </ul>
+                        <a href="qr.html" class="cta-btn">Open Tool</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <i class="fas fa-user-shield tool-icon"></i>
+                        <div class="tool-name">Anonymous Messages</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h4>Secure Chat</h4>
+                        <ul>
+                            <li>Encrypted Messaging</li>
+                            <li>No Identity Tracking</li>
+                            <li>Self-Destruct Options</li>
+                        </ul>
+                        <a href="anonymous.html" class="cta-btn">Open Tool</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <i class="fas fa-file-image tool-icon"></i>
+                        <div class="tool-name">Image To Text</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h4>OCR Engine</h4>
+                        <ul>
+                            <li>Extract Text from Pics</li>
+                            <li>Drag & Drop Interface</li>
+                            <li>Copy to Clipboard</li>
+                        </ul>
+                        <a href="OCR.html" class="cta-btn">Open Tool</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <i class="fas fa-scissors tool-icon"></i>
+                        <div class="tool-name">Short Link</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h4>Simplify URLs</h4>
+                        <ul>
+                            <li>Trim Long Links</li>
+                            <li>Track Clicks (Optional)</li>
+                            <li>Easy Sharing</li>
+                        </ul>
+                        <a href="link-shortner.html" class="cta-btn">Open Tool</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <i class="fas fa-palette tool-icon"></i>
+                        <div class="tool-name">Color Palettes</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h4>For Designers</h4>
+                        <ul>
+                            <li>Upload any Image</li>
+                            <li>Extract Dominant Colors</li>
+                            <li>One-click Hex Copy</li>
+                        </ul>
+                        <a href="color-palette.html" class="cta-btn">Open Tool</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <i class="fas fa-file-signature tool-icon"></i>
+                        <div class="tool-name">Add PDF Watermark</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h4>Protect Files</h4>
+                        <ul>
+                            <li>Process PDFs Locally</li>
+                            <li>Custom Text & Opacity</li>
+                            <li>Secure Branding</li>
+                        </ul>
+                        <a href="watermark.html" class="cta-btn">Open Tool</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <i class="fas fa-object-group tool-icon"></i>
+                        <div class="tool-name">PDF Merger</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h4>Combine Docs</h4>
+                        <ul>
+                            <li>Join Multiple PDFs</li>
+                            <li>Rearrange Pages</li>
+                            <li>Fast & Private</li>
+                        </ul>
+                        <a href="pdf-merger.html" class="cta-btn">Open Tool</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <i class="fas fa-map-location-dot tool-icon"></i>
+                        <div class="tool-name">Image Details Finder</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <h4>EXIF Data</h4>
+                        <ul>
+                            <li>View Camera Settings</li>
+                            <li>Find GPS Location</li>
+                            <li>Analyze Metadata</li>
+                        </ul>
+                        <a href="exif-finder.html" class="cta-btn">Open Tool</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="dev-section">
+        <div class="dev-card">
+            <img src="https://i.ibb.co/G3rxz98c/Whats-App-Image-2025-07-21-at-13-35-30-cbef8f6b-removebg.png" alt="Developer" class="dev-img">
+
+            
+            <h2 class="dev-name">Created by Kasun Dilshan</h2> 
+            <h3 style="font-size: 20px; color:#9571a5; margin-top: 10px; font-weight: 700;">The Two Zero (PVT.) Ltd</h3>
+            <p class="dev-role">BSc(Hons) Computer Science</p>
+            
+            <p style="color: var(--text-muted); margin-bottom: 25px;">
+                "I built Kawalama.lk to solve everyday digital problems with simple, privacy-focused tools. 
+                Passionate about Web Development, UI/UX, and making life easier for everyone."
+            </p>
+            
+            <div class="dev-socials">
+                <a href="https://github.com/kasun-dil"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/kasun-dilshan"><i class="fab fa-linkedin"></i></a>
+                <a href="mailto:kasundilshan.lk@gmail.com"><i class="fas fa-envelope"></i></a>
+                <a href="https://www.instagram.com/ka_sun.dil"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="simple-footer">
+        <div class="container">
+            <p>&copy; 2025 Kawalama.lk. Developed by The Two Zero - Kasun Dilshan</p>
+             <div class="footer-links">
+                <a href="home.html">Home</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Use</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Smart Header Logic (Hides on Scroll Down)
+        let lastScrollTop = 0;
+        const header = document.getElementById('mainHeader');
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if(scrollTop > lastScrollTop){ header.classList.add('hidden'); }
+            else { header.classList.remove('hidden'); header.classList.add('scrolled'); }
+            if(scrollTop <= 0) header.classList.remove('scrolled');
+            lastScrollTop = scrollTop;
+        });
+
+        // Theme Toggle Logic
+        const htmlEl = document.documentElement;
+        const toggleBtn = document.getElementById('themeToggle');
+        
+        toggleBtn.addEventListener('click', () => {
+            const current = htmlEl.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            htmlEl.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kawalama.lk - PDF Merger</title>
+    
+    <link rel="shortcut icon" href="https://i.ibb.co/nMXRRjmY/Untitled-design.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --logo-blue: #3b82f6; 
+            --brand-text-color: #1e293b;
+            --bg-gradient: linear-gradient(-45deg, #fff1f2, #ffe4e6, #fbcfe8, #f9a8d4);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #881337; 
+            --text-muted: #be123c;
+            --border-color: rgba(225, 29, 72, 0.2);
+            --input-bg: #fff0f5;
+            
+            /* --- BUTTON GRADIENTS --- */
+            --btn-grad-merge: linear-gradient(45deg, #f43f5e, #e11d48, #be123c);
+            --btn-grad-down: linear-gradient(45deg, #10b981, #059669, #047857);
+            
+            --btn-text: #ffffff;
+            --loader-color: #e11d48;
+        }
+
+        [data-theme="dark"] {
+            --bg-gradient: linear-gradient(-45deg, #0f0505, #3f0914, #1c050a, #4c0519);
+            --card-bg: rgba(20, 5, 10, 0.85); 
+            --brand-text-color: #ffffff; 
+            --text-main: #ffe4e6; 
+            --text-muted: #fda4af; 
+            --border-color: rgba(251, 113, 133, 0.3);
+            --input-bg: rgba(40, 10, 20, 0.6);
+            
+            --btn-grad-merge: linear-gradient(45deg, #be123c, #e11d48, #fb7185);
+            --btn-grad-down: linear-gradient(45deg, #059669, #10b981, #34d399);
+            
+            --btn-text: #ffffff;
+            --loader-color: #fb7185;
+        }
+
+        /* --- GLOBAL LAYOUT --- */
+        * { box-sizing: border-box; transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite; 
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0; padding: 0; 
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .page-wrapper {
+            flex: 1;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; width: 100%;
+            position: relative; 
+            z-index: 1;
+        }
+
+        .container-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            padding: 3rem; border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+            width: 100%; max-width: 700px;
+            text-align: center; border: 1px solid var(--border-color);
+            animation: fadeInUp 0.6s ease forwards;
+            position: relative;
+        }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- HEADER & TOGGLE --- */
+        .site-branding { 
+            position: absolute; 
+            top: 25px; 
+            left: 25px; 
+            z-index: 100;
+            text-align: left; /* FORCE LEFT ALIGNMENT */
+        }
+        
+        .brand-text h1 { font-size: 24px; font-weight: 800; margin: 0; color: var(--brand-text-color); }
+        .brand-text span { color: var(--logo-blue); }
+        .subtitle { font-size: 13px; color: var(--text-muted); opacity: 0.8; }
+        .site-branding a { text-decoration: none; }
+
+        .theme-toggle {
+            position: absolute; top: 25px; right: 25px;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-main); z-index: 100;
+        }
+
+        /* --- FIX FOR MOBILE OVERLAP --- */
+        @media (max-width: 768px) {
+            .page-wrapper {
+                align-items: flex-start;
+                /* PUSH CONTENT DOWN SO IT DOESN'T HIT LOGO */
+                padding-top: 120px; 
+            }
+
+            .container-card {
+                padding: 2rem;
+            }
+            
+            /* Logo stays Top-Left, Toggle stays Top-Right. 
+               The padding-top above fixes the overlap. */
+        }
+
+        /* --- UPLOAD & LIST VIEWS --- */
+        #upload-view { display: block; }
+        .dropzone {
+            border: 2px dashed var(--border-color);
+            border-radius: 20px; padding: 50px 20px;
+            background: var(--input-bg); cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .dropzone:hover { border-color: #f43f5e; transform: scale(1.02); background: rgba(244, 63, 94, 0.1); }
+        .drop-icon { width: 60px; height: 60px; color: var(--text-muted); margin-bottom: 15px; }
+
+        #list-view { display: none; text-align: left; }
+        
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .section-header h3 { margin: 0; font-size: 1.2rem; }
+        .header-actions { display: flex; gap: 10px; }
+
+        .btn-small {
+            background: transparent; border: 1px dashed var(--border-color);
+            color: var(--text-muted); padding: 8px 15px; border-radius: 8px;
+            cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 5px;
+        }
+        .btn-small:hover { background: var(--border-color); color: var(--text-main); }
+        .btn-clear:hover { background: rgba(244, 63, 94, 0.2); border-color: #f43f5e; color: #f43f5e; }
+
+        .file-list { list-style: none; padding: 0; margin: 0 0 25px 0; max-height: 300px; overflow-y: auto; }
+        .file-item {
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            padding: 15px; border-radius: 12px; margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        .file-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+        .file-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+        .file-controls { display: flex; gap: 8px; }
+        .ctrl-btn {
+            background: rgba(0,0,0,0.1); border: none; color: var(--text-main);
+            width: 32px; height: 32px; border-radius: 8px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .ctrl-btn:hover { background: var(--text-muted); color: white; transform: translateY(-2px); }
+        .ctrl-btn.remove { color: #f43f5e; background: rgba(244, 63, 94, 0.1); }
+        .ctrl-btn.remove:hover { background: #f43f5e; color: white; }
+
+        /* --- BUTTONS --- */
+        .action-buttons-container {
+            display: flex; flex-direction: column; gap: 15px; margin-top: 15px;
+        }
+
+        button.main-btn, button.download-btn {
+            width: 100%; padding: 18px;
+            background-size: 200% auto;
+            color: var(--btn-text); border: none; border-radius: 14px;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); transition: 0.5s;
+        }
+
+        /* RED (Merge) */
+        button.main-btn { background-image: var(--btn-grad-merge); }
+        
+        /* GREEN (Download) */
+        button.download-btn { background-image: var(--btn-grad-down); display: none; }
+
+        button.main-btn:hover { background-position: right center; transform: translateY(-3px); box-shadow: 0 15px 30px rgba(225, 29, 72, 0.4); }
+        button.download-btn:hover { background-position: right center; transform: translateY(-3px); box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4); }
+
+        /* Footer */
+        footer {
+            text-align: center; padding: 20px; font-size: 13px;
+            color: var(--text-muted);
+            width: 100%; margin-top: auto;
+        }
+
+        .loader {
+            display: none; border: 3px solid var(--border-color);
+            border-top: 3px solid var(--loader-color); border-radius: 50%;
+            width: 30px; height: 30px; animation: spin 0.8s linear infinite; margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="site-branding">
+        <a href="dashboard.html">
+            <div class="brand-text">
+                <h1>Kawalama<span>.lk</span></h1>
+                <div class="subtitle">PDF Merger</div>
+            </div>
+        </a>
+    </div>
+
+    <div id="themeToggle" class="theme-toggle">
+        <svg id="sunIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg id="moonIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </div>
+
+    <div class="page-wrapper">
+        <div class="container-card">
+            <h2>Merge PDF Files</h2>
+            <p style="margin-bottom:30px;">Combine multiple documents securely.</p>
+
+            <input type="file" id="fileInput" accept="application/pdf" multiple style="display:none;">
+
+            <div id="upload-view">
+                <div class="dropzone" id="dropzone">
+                    <svg class="drop-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <div style="font-weight:700; font-size:1.1rem;">Click or Drag PDFs Here</div>
+                </div>
+            </div>
+
+            <div id="list-view">
+                <div class="section-header">
+                    <h3>Files to Merge</h3>
+                    <div class="header-actions">
+                        <button class="btn-small" onclick="document.getElementById('fileInput').click()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Add
+                        </button>
+                        <button class="btn-small btn-clear" onclick="clearAllFiles()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+
+                <ul class="file-list" id="fileList"></ul>
+
+                <div class="loader" id="loader"></div>
+                
+                <div class="action-buttons-container">
+                    <button class="main-btn" id="mergeBtn" onclick="mergePDFs()">Merge PDFs</button>
+                    <button class="download-btn" id="downloadBtn" onclick="downloadPDF()"> Download Merged PDF</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; <span id="year"></span> Kawalama.lk - PDF Merger</p>
+    </footer>
+
+    <script>
+        // --- THEME ---
+        const htmlEl = document.documentElement;
+        const toggleBtn = document.getElementById('themeToggle');
+        const moonIcon = document.getElementById('moonIcon');
+        const sunIcon = document.getElementById('sunIcon');
+
+        function updateIcons(theme) {
+            if(theme === 'dark') { moonIcon.style.display = 'none'; sunIcon.style.display = 'block'; } 
+            else { moonIcon.style.display = 'block'; sunIcon.style.display = 'none'; }
+        }
+        updateIcons(htmlEl.getAttribute('data-theme'));
+
+        toggleBtn.addEventListener('click', () => {
+            const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            htmlEl.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateIcons(next);
+        });
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // --- PDF LOGIC ---
+        const { PDFDocument } = PDFLib;
+        const fileInput = document.getElementById('fileInput');
+        const dropzone = document.getElementById('dropzone');
+        const fileListEl = document.getElementById('fileList');
+        const mergeBtn = document.getElementById('mergeBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const loader = document.getElementById('loader');
+        const uploadView = document.getElementById('upload-view');
+        const listView = document.getElementById('list-view');
+
+        let selectedFiles = [];
+        let mergedPdfBytes = null;
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = '#f43f5e'; });
+        dropzone.addEventListener('dragleave', () => dropzone.style.borderColor = '');
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault(); handleFiles(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            for (const file of files) {
+                if (file.type === 'application/pdf') selectedFiles.push(file);
+            }
+            updateView();
+        }
+
+        function updateView() {
+            if (selectedFiles.length > 0) {
+                uploadView.style.display = 'none';
+                listView.style.display = 'block';
+                renderFileList();
+            } else {
+                uploadView.style.display = 'block';
+                listView.style.display = 'none';
+            }
+            if(!mergedPdfBytes) downloadBtn.style.display = 'none';
+        }
+
+        function renderFileList() {
+            fileListEl.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                li.innerHTML = `
+                    <div class="file-info">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--logo-blue)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        <span class="file-name">${file.name}</span>
+                    </div>
+                    <div class="file-controls">
+                        <button class="ctrl-btn" onclick="moveFile(${index}, -1)" title="Up">↑</button>
+                        <button class="ctrl-btn" onclick="moveFile(${index}, 1)" title="Down">↓</button>
+                        <button class="ctrl-btn remove" onclick="removeFile(${index})" title="Remove">✕</button>
+                    </div>
+                `;
+                fileListEl.appendChild(li);
+            });
+            
+            if(downloadBtn.style.display === 'none') {
+                mergeBtn.innerText = selectedFiles.length > 0 ? `Merge ${selectedFiles.length} PDFs` : "Merge PDFs";
+            }
+        }
+
+        function clearAllFiles() {
+            if(confirm("Are you sure you want to clear all files?")) {
+                selectedFiles = [];
+                mergedPdfBytes = null;
+                fileInput.value = ''; 
+                downloadBtn.style.display = 'none';
+                mergeBtn.style.display = 'block';
+                mergeBtn.innerText = "Merge PDFs";
+                updateView(); 
+            }
+        }
+
+        window.moveFile = (index, direction) => {
+            if ((index === 0 && direction === -1) || (index === selectedFiles.length - 1 && direction === 1)) return;
+            const temp = selectedFiles[index];
+            selectedFiles[index] = selectedFiles[index + direction];
+            selectedFiles[index + direction] = temp;
+            
+            mergedPdfBytes = null;
+            downloadBtn.style.display = 'none';
+            mergeBtn.innerText = `Merge ${selectedFiles.length} PDFs`;
+            
+            renderFileList();
+        };
+
+        window.removeFile = (index) => {
+            selectedFiles.splice(index, 1);
+            mergedPdfBytes = null;
+            downloadBtn.style.display = 'none';
+            
+            if(selectedFiles.length === 0) {
+                updateView();
+            } else {
+                renderFileList();
+            }
+        };
+
+        async function mergePDFs() {
+            if (selectedFiles.length < 2) {
+                alert('Please select at least 2 PDF files.');
+                return;
+            }
+
+            loader.style.display = 'block';
+            mergeBtn.innerText = 'Processing...';
+            mergeBtn.disabled = true;
+
+            try {
+                const mergedPdf = await PDFDocument.create();
+                for (const file of selectedFiles) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await PDFDocument.load(arrayBuffer);
+                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                    copiedPages.forEach((page) => mergedPdf.addPage(page));
+                }
+                mergedPdfBytes = await mergedPdf.save();
+                
+                loader.style.display = 'none';
+                
+                mergeBtn.disabled = false;
+                mergeBtn.innerText = "Merge Again"; 
+                downloadBtn.style.display = 'block';
+                
+            } catch (err) {
+                console.error(err);
+                loader.style.display = 'none';
+                mergeBtn.disabled = false;
+                mergeBtn.innerText = 'Try Again';
+                alert('Error merging PDFs.');
+            }
+        }
+
+        window.downloadPDF = () => {
+            if (!mergedPdfBytes) return;
+            const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'kawalama_merged.pdf';
+            link.click();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kawalama.lk - Short Link</title>
+    
+    <link rel="shortcut icon" href="https://i.ibb.co/S4VbCBpM/Untitled-design-6.png" type="image/png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <style>
+        /* --- THEME VARIABLES (Green/Mint) --- */
+        :root {
+            /* 1. BRAND COLORS */
+            --logo-blue: #3b82f6; 
+            --brand-text-color: #1e293b;
+            /* 2. SITE THEME - LIGHT MODE */
+            /* Animated Background Gradient Colors */
+            --bg-gradient: linear-gradient(135deg, #e7fced, #d0fadf, #aff8c9, #f0fdf4);
+            
+            --card-bg: #ffffff;
+            --text-main: #1e293b; 
+            --text-muted: #64748b; 
+            --border-color: rgba(0, 0, 0, 0.08);
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --input-bg: #f8fafc;
+            
+            /* Green Button Gradient */
+            --btn-grad: linear-gradient(135deg, #10b981 0%, #34d399 50%, #10b981 100%);
+            --btn-text: #ffffff;
+            --loader-color: #10b981;
+        }
+
+        [data-theme="dark"] {
+            /* SITE THEME - DARK MODE */
+            /* Deep Moving Gradient */
+            --bg-gradient: linear-gradient(135deg, #020617, #064e3b, #065f46, #020617);
+            
+            --card-bg: #0f172a; 
+            --brand-text-color: #ffffff; 
+            --text-main: #f8fafc; 
+            --text-muted: #94a3b8; 
+            --border-color: rgba(255, 255, 255, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --input-bg: #1e293b;
+            
+            /* Dark Mode Button Gradient */
+            --btn-grad: linear-gradient(135deg, #059669 0%, #10b981 50%, #059669 100%);
+            --btn-text: #ffffff;
+            --loader-color: #34d399;
+        }
+
+        /* --- ANIMATIONS --- */
+        
+        /* 1. Background Flow */
+        @keyframes glowingBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 2. Content Slide Up */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- BASE STYLES --- */
+        * { box-sizing: border-box; transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            background-size: 300% 300%; /* Important for animation */
+            animation: glowingBackground 15s ease infinite; /* The background animation */
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column; /* FIX ADDED HERE: Ensures Footer stacks below Card */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* --- FIXED HEADER ELEMENTS --- */
+        .site-branding {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 100;
+            text-align: left;
+            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        
+        .site-branding a { text-decoration: none; display: block; }
+
+        .brand-text h1 {
+            font-size: 24px; 
+            font-weight: 800; 
+            margin: 0;
+            letter-spacing: -0.5px;
+            color: var(--brand-text-color);
+        }
+        .brand-text span { color: var(--logo-blue); }
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            color: var(--text-main);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            z-index: 100;
+            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        .theme-toggle:hover { transform: scale(1.1); }
+        .theme-toggle svg { width: 20px; height: 20px; stroke-width: 2; }
+
+
+        /* --- MAIN CARD --- */
+        .container-card {
+            background: var(--card-bg);
+            padding: 3.5rem 3rem;
+            border-radius: 24px;
+            box-shadow: 0 25px 60px var(--shadow-color);
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            position: relative;
+            
+            /* Entry Animation */
+            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s forwards;
+            opacity: 0;
+        }
+
+        .container-card h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+        .container-card p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 35px;
+            font-weight: 500;
+        }
+
+        /* Input Group */
+        .input-group { 
+            position: relative; 
+            margin-bottom: 25px; 
+            text-align: left; 
+        }
+        
+        input {
+            width: 100%;
+            padding: 18px 50px 18px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            font-family: inherit;
+        }
+        input:focus { 
+            border-color: #10b981; 
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 18px;
+            display: none;
+            padding: 5px;
+            border-radius: 50%;
+        }
+        .clear-btn:hover { background-color: rgba(0,0,0,0.05); color: #ef4444; }
+        
+        /* --- BUTTONS & HOVER EFFECTS --- */
+        button.main-btn {
+            width: 100%;
+            padding: 18px;
+            /* Animated Gradient Background */
+            background-image: var(--btn-grad);
+            background-size: 200% auto;
+            
+            color: var(--btn-text);
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        button.main-btn:hover { 
+            background-position: right center; /* Shifts the gradient */
+            transform: translateY(-3px); /* Lifts up */
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4); /* Glow increases */
+        }
+        button.main-btn:active { transform: scale(0.98); }
+
+        /* Loader */
+        .loader {
+            display: none;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--loader-color);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            animation: spin 0.8s linear infinite;
+            margin: 20px auto;
+        }
+
+        /* Result Section */
+        .result-box {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            text-align: left;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .short-url {
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            word-break: break-all;
+            background: var(--card-bg);
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .action-buttons { display: flex; gap: 15px; }
+
+        .btn-action {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .btn-copy { background: #e2e8f0; color: #1e293b; }
+        [data-theme="dark"] .btn-copy { background: #334155; color: white; }
+        
+        .btn-copy:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        .btn-test { 
+            background-color: transparent; 
+            border: 2px solid var(--text-muted); 
+            color: var(--text-muted); 
+            box-shadow: none;
+        }
+        .btn-test:hover { border-color: var(--text-main); color: var(--text-main); transform: translateY(-2px); }
+
+        /* Footer */
+        footer {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            opacity: 0.7;
+            pointer-events: none;
+            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        @media (max-width: 768px) {
+            body { align-items: flex-start; padding-top: 120px; }
+            .container-card { padding: 2rem; }
+            
+            /* FIX ADDED HERE: Pushes footer to bottom on mobile */
+            footer { 
+                position: relative; 
+                bottom: auto; 
+                margin-top: auto; 
+                padding-bottom: 20px; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="site-branding">
+    <a href="dashboard.html">
+        <div class="brand-text">
+            <h1>Kawalama<span>.lk</span></h1>
+            <div class="subtitle">Fast Link Shortener</div>
+        </div>
+    </a>
+</div>
+
+<div id="themeToggle" class="theme-toggle" aria-label="Switch Theme">
+    <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+</div>
+
+<div class="container-card">
+    <h2>Link Shortener</h2>
+    <p>Paste your long URL below to create a quick, shareable link.</p>
+
+    <div class="input-group">
+        <input type="url" id="longUrl" placeholder="Paste long link here..." required oninput="toggleClearBtn()" onkeypress="if(event.key==='Enter') shortenLink()">
+        <button id="clearBtn" class="clear-btn" onclick="clearInput()" title="Clear">✕</button>
+    </div>
+
+    <button class="main-btn" onclick="shortenLink()">Shorten Link</button>
+    
+    <div class="loader" id="loader"></div>
+
+    <div class="result-box" id="resultBox">
+        <div class="short-url" id="shortLink"></div>
+        <div class="action-buttons">
+            <button class="btn-action btn-copy" onclick="copyLink()">Copy</button>
+            <button class="btn-action btn-test" onclick="testLink()">Test Link ➜</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p style="margin: 0;">&copy; <span id="year"></span> Kawalama.lk - Link Shortner </p>
+</footer>
+
+<script>
+    // --- THEME LOGIC ---
+    const htmlEl = document.documentElement;
+    const toggleBtn = document.getElementById('themeToggle');
+    const moonIcon = document.getElementById('moonIcon');
+    const sunIcon = document.getElementById('sunIcon');
+
+    function updateIcons(theme) {
+        if(theme === 'dark') {
+            moonIcon.style.display = 'none';
+            sunIcon.style.display = 'block';
+        } else {
+            moonIcon.style.display = 'block';
+            sunIcon.style.display = 'none';
+        }
+    }
+    updateIcons(htmlEl.getAttribute('data-theme'));
+
+    toggleBtn.addEventListener('click', () => {
+        const current = htmlEl.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        htmlEl.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateIcons(next);
+    });
+    
+    // --- UI LOGIC ---
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    function toggleClearBtn() {
+        const input = document.getElementById('longUrl');
+        const btn = document.getElementById('clearBtn');
+        btn.style.display = input.value.length > 0 ? 'flex' : 'none';
+    }
+
+    function clearInput() {
+        const input = document.getElementById('longUrl');
+        input.value = '';
+        input.focus();
+        toggleClearBtn();
+        document.getElementById('resultBox').style.display = 'none';
+    }
+
+    // --- SHORTENER LOGIC ---
+    async function shortenLink() {
+        const longUrl = document.getElementById('longUrl').value;
+        const loader = document.getElementById('loader');
+        const resultBox = document.getElementById('resultBox');
+        const shortLinkDisplay = document.getElementById('shortLink');
+        const mainBtn = document.querySelector('.main-btn');
+
+        if (!longUrl) {
+            alert("Please paste a link first!");
+            return;
+        }
+        
+        mainBtn.disabled = true;
+        loader.style.display = 'block';
+        resultBox.style.display = 'none';
+
+        try {
+            const apiUrl = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`;
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
+
+            const response = await fetch(proxyUrl);
+            const data = await response.json();
+
+            if (data.status && data.status.http_code === 200 && data.contents.startsWith('http')) {
+                shortLinkDisplay.innerText = data.contents;
+                resultBox.style.display = 'block';
+            } else {
+                alert("Error: Could not shorten link. Please check the URL format.");
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("Network error. Could not connect to the shortening service.");
+        } finally {
+            loader.style.display = 'none';
+            mainBtn.disabled = false;
+        }
+    }
+
+    function copyLink() {
+        const link = document.getElementById('shortLink').innerText;
+        navigator.clipboard.writeText(link).then(() => {
+            const btn = document.querySelector('.btn-copy');
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            setTimeout(() => btn.innerText = originalText, 2000);
+        }).catch(err => {
+            alert("Could not copy link. Copy manually.");
+        });
+    }
+
+    function testLink() {
+        const link = document.getElementById('shortLink').innerText;
+        if(link) {
+            window.open(link, '_blank');
+        }
+    }
+</script>
+
+</body>
+</html>

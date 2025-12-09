@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>kawalama.lk - Dashboard</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+
+  <style>
+    :root {
+      /* -- Light Mode Variables -- */
+      --bg-gradient: linear-gradient(135deg, #c4e6fd, #ffcce9, #cabffa, #b6f7e9);
+      
+      --card-bg: #ffffff;
+      --card-text: #3f0d7d;
+      --card-text-hover: #d946ef;
+      
+      /* Resting Shadow */
+      --card-shadow: 0 15px 35px rgba(139, 92, 246, 0.15);
+      
+      /* HOVER SHADOW (Light Mode - Soft Blue) */
+      --hover-shadow: 0 15px 35px rgba(144, 40, 170, 0.678);
+      /* Borders */
+      --border-gradient-start: #d946ef; 
+      --border-gradient-mid: #ffffff;
+      --border-gradient-end: #8b5cf6;
+      
+      /* Home Button */
+      --home-btn-color: #3f0d7d;
+      --home-btn-border: #3f0d7d;
+      --home-btn-bg: rgba(255, 255, 255, 0.6);
+      
+      --toggle-bg: rgba(255, 255, 255, 0.8);
+      --toggle-icon: #3f0d7d;
+    }
+
+    [data-theme="dark"] {
+      /* -- Dark Mode Variables -- */
+      --bg-gradient: linear-gradient(135deg, #05516bff, #57062fff, #2b0a49, rgb(12, 79, 102));
+      
+      --card-bg: #ffffff; 
+      --card-text: #3f0d7d;
+      --card-text-hover: #007bbf;
+      
+      /* Resting Shadow */
+      --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      
+      /* HOVER SHADOW (Dark Mode - Your Custom Pink/Purple) */
+    
+      --hover-shadow: 0 20px 40px rgba(75, 205, 248, 0.4);
+      
+      /* Borders */
+      --border-gradient-start: #39cdff;
+      --border-gradient-mid: #ffffff;
+      --border-gradient-end: #39cdff;
+      
+      /* Home Button */
+      --home-btn-color: #a4fcf4;
+      --home-btn-border: #a4fcf4;
+      --home-btn-bg: rgba(30, 41, 59, 0.8);;
+      
+      --toggle-bg: rgba(30, 41, 59, 0.8);
+      --toggle-icon: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes glowingBackground {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gradient);
+      background-size: 300% 300%;
+      animation: glowingBackground 15s ease infinite;
+      min-height: 100vh;
+      padding: 80px 20px 40px;
+      transition: background 0.5s ease;
+    }
+
+    header, .container {
+      animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    /* HEADER */
+    header {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+    }
+
+    .home-button {
+      color: var(--home-btn-color);
+      background: var(--home-btn-bg);
+      padding: 8px 18px;
+      border-radius: 17px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: 0 4px 5px rgba(0,0,0,0.1);
+      transition: all 0.3s ease-in-out;
+      cursor: pointer;
+      border: 1px solid var(--home-btn-border);
+      backdrop-filter: blur(5px);
+    }
+
+    .home-button:hover {
+      background: linear-gradient(135deg, #27a3cc, #015988);
+      color: #ffffff;
+      transform: scale(1.08);
+      box-shadow: 0px 0px 5px rgba(57, 205, 255, 0.6);
+      border-color: transparent;
+    }
+
+    /* THEME TOGGLE */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--toggle-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--toggle-icon);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      transition: transform 0.2s, background 0.3s;
+    }
+    .theme-toggle:hover { transform: scale(1.1); }
+    .theme-toggle svg { width: 22px; height: 22px; stroke-width: 2; }
+
+    /* GRID */
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 35px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    /* BUTTONS */
+    .qr-button {
+      background: var(--card-bg);
+      border-radius: 25px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: var(--card-shadow);
+      transition: all 0.35s ease-in-out;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* --- HOVER EFFECT --- */
+    .qr-button:hover {
+      transform: translateY(-8px) scale(1.03);
+      /* This variable changes color based on Light/Dark mode */
+      box-shadow: var(--hover-shadow); 
+    }
+
+    /* Animated Border */
+    .qr-button::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 25px;
+      padding: 2px;
+      background: linear-gradient(135deg, var(--border-gradient-start), var(--border-gradient-mid), var(--border-gradient-end));
+      background-size: 300% 300%;
+      animation: glowingBorder 4s linear infinite;
+      -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+    }
+
+    @keyframes glowingBorder {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .qr-button img {
+      width: 145px;
+      height: 145px;
+      transition: transform 0.3s ease;
+      border-radius: 15px;
+    }
+
+    .qr-button:hover img {
+      transform: rotate(3deg) scale(1.05);
+    }
+
+    .qr-button p {
+      margin-top: 18px;
+      font-weight: 700;
+      color: var(--card-text);
+      font-size: 18px;
+      transition: color 0.3s ease;
+    }
+
+    .qr-button:hover p {
+      color: var(--card-text-hover);
+    }
+
+    /* MOBILE OPTIMIZATION */
+    @media (max-width: 600px) {
+      .container {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 18px;
+      }
+      .qr-button img {
+        width: 90px;
+        height: 90px;
+      }
+      .qr-button p {
+        font-size: 15px;
+      }
+      .home-button {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+      .qr-button {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="home.html" class="home-button">← Home</a>
+  </header>
+
+  <div id="themeToggle" class="theme-toggle" aria-label="Switch Theme">
+    <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+  </div>
+
+  <div class="container">
+    <a href="qr.html" class="qr-button">
+      <img src="https://i.ibb.co/Xf9nPFw7/Untitled-design-7.png" alt="QR Generator" />
+      <p>QR Generator</p>
+    </a>
+    <a href="site1.html" class="qr-button">
+      <img src="https://i.ibb.co/JFFLWKH5/Untitled-design-4.png" alt="Anonymous Massage" />
+      <p>Anonymous Messages</p>
+    </a>
+    <a href="OCR.html" class="qr-button">
+      <img src="https://i.ibb.co/Jjx8Mb70/Untitled-design-5.png" alt="Image To Text" />
+      <p>Image To Text</p>
+    </a>
+    <a href="link-shortner.html" class="qr-button">
+      <img src="https://i.ibb.co/S4VbCBpM/Untitled-design-6.png" alt="Shot Link" />
+      <p>Short Link</p>
+    </a>
+    <a href="color-palette.html" class="qr-button">
+      <img src="https://i.ibb.co/GNCgKV3/Untitled-design-8.png" alt="Color Palette" />
+      <p>Color Palettes</p>
+    </a>
+    <a href="watermark.html" class="qr-button">
+      <img src="https://i.ibb.co/hbh1Hry/Untitled-design-9.png" alt="watermark" />
+      <p>Add PDF Watermark</p>
+    </a>
+    <a href="pdf-merger.html" class="qr-button">
+      <img src="https://i.ibb.co/nMXRRjmY/Untitled-design.png" alt="PDF Merger" />
+      <p>PDF Merger</p>
+    </a>
+    <a href="image-details.html" class="qr-button">
+      <img src="https://i.ibb.co/TDLXdKLh/Untitled-design-1.png" alt="image deatils" />
+      <p>Image Details(EXIF) Finder</p>
+    </a>
+  </div>
+
+  <script>
+    const toggleBtn = document.getElementById('themeToggle');
+    const moonIcon = document.getElementById('moonIcon');
+    const sunIcon = document.getElementById('sunIcon');
+    const htmlEl = document.documentElement;
+
+    function updateIcons(theme) {
+      if(theme === 'dark') {
+        moonIcon.style.display = 'none';
+        sunIcon.style.display = 'block';
+      } else {
+        moonIcon.style.display = 'block';
+        sunIcon.style.display = 'none';
+      }
+    }
+
+    updateIcons(htmlEl.getAttribute('data-theme'));
+
+    toggleBtn.addEventListener('click', () => {
+      const current = htmlEl.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      htmlEl.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateIcons(next);
+    });
+  </script>
+
+</body>
+</html>

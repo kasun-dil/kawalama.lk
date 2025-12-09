@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kawalama.lk - Image Palette</title>
+    
+    <link rel="shortcut icon" href="https://i.ibb.co/GNCgKV3/Untitled-design-8.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --brand-blue: #3b82f6; 
+            --theme-accent: #f97316; 
+            --logo-color: #1e293b;
+
+            /* Light Mode */
+            --bg-gradient: linear-gradient(-45deg, #fff7ed, #ffedd5, #fffaf0, #ffffff);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text-main: #431407; 
+            --text-muted: #78350f; 
+            --border-color: rgba(249, 115, 22, 0.2);
+            --glass-bg: rgba(255, 247, 237, 0.6);
+            --btn-grad: linear-gradient(-45deg, #ea580c, #f97316, #fb923c, #ea580c);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode */
+            --logo-color: #f8fafc; 
+            --bg-gradient: linear-gradient(-45deg, #1a0f00, #291400, #331a00, #0f0700);
+            --card-bg: rgba(26, 15, 0, 0.7);
+            --text-main: #fff7ed;
+            --text-muted: #fdba74;
+            --border-color: rgba(251, 146, 60, 0.3);
+            --glass-bg: rgba(41, 20, 0, 0.5);
+            --btn-grad: linear-gradient(-45deg, #c2410c, #ea580c, #f97316, #c2410c);
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            color: var(--text-main);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            /* Added padding-top for fixed header */
+            padding-top: 120px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- SMART HEADER --- */
+        .smart-header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            height: 80px;
+            padding: 0 30px;
+            display: flex; align-items: center; justify-content: space-between;
+            z-index: 1000;
+            transition: transform 0.4s ease-in-out, background 0.3s;
+            background: transparent;
+        }
+
+        /* Glass effect when scrolled */
+        .smart-header.scrolled {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Hidden state */
+        .smart-header.hidden {
+            transform: translateY(-100%);
+        }
+
+        .site-branding a { text-decoration: none; color: inherit; }
+        
+        .brand-text h1 { 
+            font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px; 
+            color: var(--logo-color); 
+        }
+        .brand-text span { color: var(--brand-blue); }
+        .subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
+
+        .theme-toggle {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--card-bg); backdrop-filter: blur(5px);
+            border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-main);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .theme-toggle:hover { transform: scale(1.1); border-color: var(--theme-accent); }
+        .theme-toggle svg { width: 22px; height: 22px; }
+
+        /* --- MAIN CARD --- */
+        .container-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 3rem; border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            width: 100%; max-width: 800px;
+            text-align: center; border: 1px solid var(--border-color);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .container-card h2 { margin-top: 0; margin-bottom: 10px; font-size: 1.8rem; font-weight: 700; }
+        .container-card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 30px; }
+
+        /* --- UPLOAD BOX --- */
+        .upload-wrapper { position: relative; width: 100%; margin-bottom: 30px; }
+        .upload-box {
+            background: var(--glass-bg); border: 2px dashed var(--border-color);
+            border-radius: 20px; padding: 40px 20px;
+            cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
+            min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .upload-box:hover { border-color: var(--theme-accent); background: rgba(249, 115, 22, 0.05); }
+        .upload-content { pointer-events: none; }
+        .upload-icon { font-size: 3rem; color: var(--theme-accent); margin-bottom: 10px; }
+        .upload-text { font-weight: 600; color: var(--text-main); }
+        #imageInput { display: none; }
+        #previewImg {
+            max-width: 100%; max-height: 250px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: none; z-index: 2;
+        }
+        .clear-upload-btn {
+            position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; border-radius: 50%;
+            background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted);
+            display: none; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .clear-upload-btn:hover { background: var(--theme-accent); color: white; border-color: var(--theme-accent); }
+
+        button.main-btn {
+            width: 100%; padding: 16px; background-image: var(--btn-grad);
+            background-size: 300% 300%; animation: gradientShift 4s ease infinite;
+            color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+        }
+        button.main-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(249, 115, 22, 0.5); }
+        button.main-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        /* --- SCROLL WRAPPER WITH ARROWS --- */
+        .results-wrapper {
+            position: relative; /* For arrow positioning */
+            margin-top: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .palette-scroll-container {
+            width: 100%;
+            overflow-x: auto; 
+            padding-bottom: 15px; 
+            opacity: 0; transition: opacity 0.5s;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            padding-left: 5px; padding-right: 5px;
+            
+            /* Hide scrollbar but keep functionality */
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+        }
+        .palette-scroll-container::-webkit-scrollbar { display: none; }
+
+        /* NAVIGATION ARROWS */
+        .nav-arrow {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            backdrop-filter: blur(5px);
+            color: var(--text-main);
+            font-size: 1.2rem;
+            display: none; /* Hidden by default */
+            align-items: center; justify-content: center;
+            cursor: pointer;
+            position: absolute;
+            z-index: 20;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            user-select: none;
+        }
+        .nav-arrow:hover {
+            background: var(--theme-accent);
+            color: white;
+            border-color: var(--theme-accent);
+            transform: scale(1.1);
+        }
+        .nav-arrow.left { left: -20px; }
+        .nav-arrow.right { right: -20px; }
+
+
+        .palette-flex { display: flex; gap: 15px; min-width: min-content; }
+
+        .color-chip {
+            width: 100px; height: 120px; flex-shrink: 0;
+            border-radius: 16px; position: relative; cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex; align-items: end; justify-content: center;
+            padding-bottom: 10px; overflow: hidden;
+            border: 2px solid var(--border-color);
+            scroll-snap-align: center;
+        }
+        .color-chip:hover { transform: translateY(-5px); z-index: 10; border-color: var(--theme-accent); }
+
+        .hex-label {
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;
+            background: rgba(0,0,0,0.6); color: white;
+            padding: 4px 10px; border-radius: 20px;
+            backdrop-filter: blur(4px); text-transform: uppercase;
+        }
+        
+        .copy-overlay {
+            position: absolute; inset: 0;
+            background: rgba(249, 115, 22, 0.85);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 0.9rem;
+            opacity: 0; transition: 0.2s;
+        }
+        .color-chip:active .copy-overlay { opacity: 1; }
+
+        /* --- FOOTER STYLES --- */
+        .site-footer {
+            margin-top: auto; /* Pushes to bottom */
+            padding: 30px 20px 10px 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            opacity: 0.8;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) { 
+            .smart-header { padding: 0 20px; height: 70px; }
+            .container-card { padding: 2rem; max-width: 100%; } 
+            .nav-arrow.left { left: -10px; }
+            .nav-arrow.right { right: -10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="smart-header" id="mainHeader">
+        <div class="site-branding">
+            <a href="dashboard.html">
+                <div class="brand-text">
+                    <h1>Kawalama<span>.lk</span></h1>
+                    <div class="subtitle">Image Palette Extractor</div>
+                </div>
+            </a>
+        </div>
+
+        <div id="themeToggle" class="theme-toggle" aria-label="Switch Theme">
+            <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </div>
+    </header>
+
+    <div class="container-card">
+        <h2>Extract Colors</h2>
+        <p>Upload an image to generate a beautiful color palette.</p>
+
+        <div class="upload-wrapper">
+             <div class="clear-upload-btn" id="clearUploadBtn" onclick="clearImage(event)">✕</div>
+            <div class="upload-box" onclick="document.getElementById('imageInput').click()">
+                <input type="file" id="imageInput" accept="image/*" onchange="processImage(this)">
+                <div class="upload-content" id="uploadPlaceholder">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">Click to Upload Image</div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top:5px;">JPG, PNG, WEBP</p>
+                </div>
+                <img id="previewImg" src="" alt="Preview" crossorigin="anonymous">
+            </div>
+        </div>
+
+        <button class="main-btn" id="extractBtn" onclick="triggerExtraction()" disabled>Extract Palette</button>
+    
+        <div class="results-wrapper">
+            <div class="nav-arrow left" id="prevBtn" onclick="scrollPalette(-1)">&#10094;</div>
+            
+            <div class="palette-scroll-container" id="paletteContainer">
+                <div class="palette-flex" id="paletteGrid"></div>
+            </div>
+
+            <div class="nav-arrow right" id="nextBtn" onclick="scrollPalette(1)">&#10095;</div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        kawalama.lk - image to color palette
+    </footer>
+
+<script>
+    // --- SMART HEADER LOGIC ---
+    let lastScrollTop = 0;
+    const header = document.getElementById('mainHeader');
+
+    window.addEventListener('scroll', function() {
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > lastScrollTop) {
+            // Down = Hide
+            header.classList.add('hidden');
+        } else {
+            // Up = Show
+            header.classList.remove('hidden');
+            header.classList.add('scrolled');
+        }
+        
+        if (scrollTop <= 0) {
+            header.classList.remove('scrolled');
+            header.classList.remove('hidden');
+        }
+        
+        lastScrollTop = scrollTop;
+    });
+
+    const htmlEl = document.documentElement;
+    const toggleBtn = document.getElementById('themeToggle');
+    const moonIcon = document.getElementById('moonIcon');
+    const sunIcon = document.getElementById('sunIcon');
+
+    function updateIcons(theme) {
+        if(theme === 'dark') { moonIcon.style.display = 'none'; sunIcon.style.display = 'block'; } 
+        else { moonIcon.style.display = 'block'; sunIcon.style.display = 'none'; }
+    }
+    updateIcons(htmlEl.getAttribute('data-theme'));
+
+    toggleBtn.addEventListener('click', () => {
+        const current = htmlEl.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        htmlEl.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateIcons(next);
+    });
+
+    const colorThief = new ColorThief();
+    const imgElement = document.getElementById('previewImg');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const paletteContainer = document.getElementById('paletteContainer');
+    const paletteGrid = document.getElementById('paletteGrid');
+    const extractBtn = document.getElementById('extractBtn');
+    const clearBtn = document.getElementById('clearUploadBtn');
+    const imageInput = document.getElementById('imageInput');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function processImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block';
+                uploadPlaceholder.style.display = 'none';
+                clearBtn.style.display = 'flex';
+                extractBtn.disabled = false;
+                // Hide results until extraction
+                paletteContainer.style.opacity = '0';
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function clearImage(event) {
+        event.stopPropagation();
+        imageInput.value = '';
+        imgElement.src = '';
+        imgElement.style.display = 'none';
+        uploadPlaceholder.style.display = 'block';
+        clearBtn.style.display = 'none';
+        extractBtn.disabled = true;
+        paletteContainer.style.opacity = '0';
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        paletteGrid.innerHTML = '';
+    }
+
+    function triggerExtraction() {
+        if (imgElement.complete) { extractColors(); } else { imgElement.onload = extractColors; }
+    }
+
+    function extractColors() {
+        try {
+            const palette = colorThief.getPalette(imgElement, 10);
+            displayPalette(palette);
+        } catch (e) { console.error(e); }
+    }
+
+    function displayPalette(colors) {
+        paletteGrid.innerHTML = '';
+        paletteContainer.style.opacity = '1';
+        
+        // Show Arrows
+        prevBtn.style.display = 'flex';
+        nextBtn.style.display = 'flex';
+
+        colors.forEach((rgb, index) => {
+            const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
+            const chip = document.createElement('div');
+            chip.className = 'color-chip';
+            chip.style.backgroundColor = hex;
+            chip.style.animation = `fadeInUp 0.4s ease forwards ${index * 0.05}s`;
+            chip.style.opacity = '0'; 
+            chip.onclick = () => copyToClipboard(hex);
+            chip.innerHTML = `<div class="copy-overlay">COPIED!</div><span class="hex-label">${hex}</span>`;
+            paletteGrid.appendChild(chip);
+        });
+    }
+
+    // Scroll Logic for Arrows
+    function scrollPalette(direction) {
+        const scrollAmount = 200; // Pixels to scroll
+        paletteContainer.scrollBy({
+            left: direction * scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+
+    function rgbToHex(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features - Kawalama.lk</title>
+    
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <style>
+        /* --- REUSED VARIABLES FROM ABOUT US PAGE --- */
+        :root {
+            --brand-blue: #3b82f6; 
+            --theme-accent: #d946ef; 
+            --logo-color: #1e293b;
+
+            /* Light Mode Background Gradient */
+            --bg-gradient-light: linear-gradient(-45deg, #e0c3fc, #a7d3ff, #d0a4fc, #f7b2d8);
+            
+            /* Glass Variables */
+            --glass-surface: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --sub-color: #4d4e4e;
+            
+            --icon-gradient: linear-gradient(45deg, #3b82f6, #a855f7, #ec4899); 
+            
+            --footor1: rgba(30, 30, 31, 0.8);
+            --footor2: rgba(45, 43, 51, 0.9);
+            --footor3: #8d1450;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode Background Gradient */
+            --bg-gradient-dark: linear-gradient(-45deg, #0f172a, #2e1065, #4c0519, #1e1b4b);
+
+            /* Glass Variables (Dark) */
+            --glass-surface: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.3);
+
+            --logo-color: #f8fafc; 
+            --text-main: #f1f5f9; 
+            --text-muted: #9fa9b8;
+            --sub-color: #c2c1c1;
+
+            --icon-gradient: linear-gradient(45deg, #0ea5e9, #8b5cf6, #f43f5e); 
+
+            --footor1: rgba(255, 255, 255, 0.8);
+            --footor2: #9888b9;
+            --footor3: #ec4899;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient-light);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            padding-top: 100px; 
+            position: relative; 
+        }
+
+        [data-theme="dark"] body {
+            background: var(--bg-gradient-dark);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- AMBIENT BLOBS --- */
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            z-index: -1;
+            animation: floatGlow 15s infinite alternate;
+        }
+        .glow-1 { top: -10%; left: -10%; width: 700px; height: 700px; background: radial-gradient(circle, #d946ef, #8b5cf6); }
+        .glow-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, #3b82f6, #06b6d4); }
+        
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        /* --- HEADER --- */
+        .smart-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 80px;
+            padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
+            z-index: 1000; transition: 0.4s;
+        }
+        .smart-header.scrolled {
+            background: rgba(var(--bg-color), 0.2); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .smart-header.hidden { transform: translateY(-100%); }
+
+        .brand-text { text-decoration: none; }
+        .brand-text h1 { font-size: 24px; font-weight: 800; margin: 0; color: var(--logo-color); }
+        .brand-text span { color: #3b82f6; }
+        .subtitle { font-size: 13px; color: var(--sub-color); font-weight: 500; }
+
+        .theme-toggle {
+            width: 44px; height: 44px; border-radius: 50%; 
+            background: var(--glass-surface); 
+            border: 1px solid var(--glass-border); 
+            backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-main);
+        }
+
+        /* --- FEATURES GRID LAYOUT --- */
+        .page-header {
+            text-align: center; margin-bottom: 60px; padding: 0 20px;
+        }
+        .page-title {
+            font-size: 3rem; font-weight: 800;
+            background: var(--icon-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+        .page-desc {
+            max-width: 600px; margin: 0 auto;
+            color: var(--text-muted); font-size: 1.1rem;
+        }
+
+        .features-container {
+            max-width: 1200px; width: 90%; margin: 0 auto 80px;
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 30px;
+        }
+
+        @media(min-width: 768px) {
+            .features-container { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* --- FEATURE GLASS CARD --- */
+        .feature-card {
+            background: var(--glass-surface);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex; flex-direction: column; align-items: flex-start;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .feature-icon-box {
+            width: 60px; height: 60px;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .feature-icon-box i {
+            background: var(--icon-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main); }
+        
+        .feature-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; flex-grow: 1; }
+        
+        .feature-list {
+            list-style: none; padding: 0; margin-bottom: 20px; width: 100%;
+        }
+        .feature-list li {
+            padding: 5px 0; color: var(--sub-color); font-size: 0.9rem; border-bottom: 1px solid rgba(128,128,128, 0.1);
+        }
+        .feature-list li i { color: #3b82f6; margin-right: 8px; }
+
+        .try-btn {
+            background: var(--icon-gradient);
+            color: white; border: none;
+            padding: 10px 25px; border-radius: 50px;
+            font-weight: 600; text-decoration: none;
+            font-size: 0.9rem; align-self: flex-start;
+            transition: 0.3s; opacity: 0.9;
+        }
+        .try-btn:hover { opacity: 1; transform: scale(1.02); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); color: white; }
+
+        /* --- FOOTER --- */
+        .simple-footer {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            margin-top: auto;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            font-size: 0.9rem;
+            color: var(--footor1)
+        }
+        .footer-links { margin-top: 10px; }
+        .footer-links a { color: var(--footor2); text-decoration: none; margin: 0 10px; transition: 0.3s;}
+        .footer-links a:hover { color: #bd24a8;}
+
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <header class="smart-header" id="mainHeader">
+        <a href="home.html" class="brand-text">
+            <h1>Kawalama<span>.lk</span></h1>
+            <div class="subtitle">All-in-One Toolkit</div>
+        </a>
+
+        <div id="themeToggle" class="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <h1 class="page-title">Tool Features</h1>
+        <p class="page-desc">
+            Explore the powerful capabilities of our digital toolbox. 
+            Everything runs locally in your browser for maximum privacy.
+        </p>
+    </div>
+
+    <div class="features-container">
+
+        <div class="feature-card">
+            <div class="feature-icon-box"><i class="fas fa-qrcode"></i></div>
+            <h3 class="feature-title">QR Code Generator</h3>
+            <p class="feature-text">Create high-quality QR codes instantly. Perfect for sharing links, WiFi passwords, or contact info without any server-side processing.</p>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Instant rendering</li>
+                <li><i class="fas fa-check"></i> Download as PNG</li>
+                <li><i class="fas fa-check"></i> No expiration date</li>
+            </ul>
+            <a href="qr.html" class="try-btn">Try QR Tool</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-box"><i class="fas fa-user-shield"></i></div>
+            <h3 class="feature-title">Anonymous Messages</h3>
+            <p class="feature-text">Send and receive messages without revealing your identity. Designed for secure, private communication with end-to-end privacy in mind.</p>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Zero data logging</li>
+                <li><i class="fas fa-check"></i> Encrypted transmission</li>
+                <li><i class="fas fa-check"></i> Mobile friendly interface</li>
+            </ul>
+            <a href="anonymous.html" class="try-btn">Start Chat</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-box"><i class="fas fa-file-image"></i></div>
+            <h3 class="feature-title">Image To Text (OCR)</h3>
+            <p class="feature-text">Extract text from screenshots, documents, or photos using advanced Optical Character Recognition technology directly in your browser.</p>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Powered by Tesseract.js</li>
+                <li><i class="fas fa-check"></i> Supports Drag & Drop</li>
+                <li><i class="fas fa-check"></i> One-click copy to clipboard</li>
+            </ul>
+            <a href="OCR.html" class="try-btn">Extract Text</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-box"><i class="fas fa-scissors"></i></div>
+            <h3 class="feature-title">Link Shortener</h3>
+            <p class="feature-text">Transform long, ugly URLs into clean, manageable short links. Ideal for social media bios and sharing complex addresses.</p>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Custom alias support</li>
+                <li><i class="fas fa-check"></i> Fast redirection</li>
+                <li><i class="fas fa-check"></i> Click tracking enabled</li>
+            </ul>
+            <a href="link-shortner.html" class="try-btn">Shorten URL</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-box"><i class="fas fa-palette"></i></div>
+            <h3 class="feature-title">Color Palette Generator</h3>
+            <p class="feature-text">Upload an image and instantly extract the dominant color scheme. A must-have tool for UI designers and digital artists.</p>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Auto-detect dominant colors</li>
+                <li><i class="fas fa-check"></i> Copy HEX codes instantly</li>
+                <li><i class="fas fa-check"></i> Visual color grid</li>
+            </ul>
+            <a href="color-palette.html" class="try-btn">Get Colors</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-box"><i class="fas fa-file-signature"></i></div>
+            <h3 class="feature-title">PDF Watermarker</h3>
+            <p class="feature-text">Secure your documents by adding custom text watermarks. Your files never leave your device, ensuring total document secrecy.</p>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Adjust opacity & rotation</li>
+                <li><i class="fas fa-check"></i> Custom text & font size</li>
+                <li><i class="fas fa-check"></i> Client-side processing</li>
+            </ul>
+            <a href="watermark.html" class="try-btn">Watermark PDF</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-box"><i class="fas fa-object-group"></i></div>
+            <h3 class="feature-title">PDF Merger</h3>
+            <p class="feature-text">Combine multiple PDF files into a single, organized document. Streamline your workflow by managing reports and assignments easily.</p>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Merge unlimited files</li>
+                <li><i class="fas fa-check"></i> Reorder pages easily</li>
+                <li><i class="fas fa-check"></i> Fast processing speed</li>
+            </ul>
+            <a href="pdf-merger.html" class="try-btn">Merge PDFs</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-box"><i class="fas fa-map-location-dot"></i></div>
+            <h3 class="feature-title">EXIF Data Finder</h3>
+            <p class="feature-text">Uncover hidden metadata in your photos. View camera settings, GPS location, shutter speed, and date taken information.</p>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> View GPS coordinates</li>
+                <li><i class="fas fa-check"></i> Camera model details</li>
+                <li><i class="fas fa-check"></i> Privacy analysis</li>
+            </ul>
+            <a href="image-details.html" class="try-btn">EXIF Image</a>
+        </div>
+
+    </div>
+
+    <footer class="simple-footer">
+        <div class="container">
+            <p>&copy; 2025 Kawalama.lk. Developed by The Two Zero - Kasun Dilshan</p>
+            <div class="footer-links">
+                <a href="home.html">Home</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Use</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Header Hide Script
+        let lastScrollTop = 0;
+        const header = document.getElementById('mainHeader');
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if(scrollTop > lastScrollTop){ header.classList.add('hidden'); }
+            else { header.classList.remove('hidden'); header.classList.add('scrolled'); }
+            if(scrollTop <= 0) header.classList.remove('scrolled');
+            lastScrollTop = scrollTop;
+        });
+
+        // Theme Toggle Script
+        const htmlEl = document.documentElement;
+        const toggleBtn = document.getElementById('themeToggle');
+        
+        toggleBtn.addEventListener('click', () => {
+            const current = htmlEl.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            htmlEl.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        });
+    </script>
+
+</body>
+</html>
