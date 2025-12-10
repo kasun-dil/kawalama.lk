@@ -330,31 +330,34 @@
            <div class="glass-form-container">
     <h3 style="margin-bottom: 25px; font-weight: 800; color: var(--text-main);">Send a Message</h3>
     
-    <form id="modernForm" name="kawalama-contact" method="POST" data-netlify="true">
-        
-        <input type="hidden" name="form-name" value="kawalama-contact">
+    <form action="https://formsubmit.co/KASUNDILSHAN.LK@GMAIL.COM" method="POST">
+    
+    <input type="hidden" name="_captcha" value="false">
+    <input type="hidden" name="_next" value="https://kawalamalk.netlify.app/contact.html">
+    <input type="hidden" name="_subject" value="New Message from Kawalama Contact Form!">
 
-        <div class="row">
-            <div class="col-md-6">
-                <label class="form-label">Name</label>
-                <input type="text" name="name" class="modern-input" placeholder="John Doe" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="modern-input" placeholder="john@example.com" required>
-            </div>
+    <div class="row">
+        <div class="col-md-6">
+            <label class="form-label">Name</label>
+            <input type="text" name="name" class="modern-input" placeholder="John Doe" required>
         </div>
+        <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="modern-input" placeholder="john@example.com" required>
+        </div>
+    </div>
 
-        <label class="form-label">Subject</label>
-        <input type="text" name="subject" class="modern-input" placeholder="Feature Request / Bug Report" required>
+    <label class="form-label">Subject</label>
+    <input type="text" name="subject" class="modern-input" placeholder="Feature Request" required>
 
-        <label class="form-label">Message</label>
-        <textarea name="message" class="modern-input" rows="4" placeholder="How can we help you?" required></textarea>
+    <label class="form-label">Message</label>
+    <textarea name="message" class="modern-input" rows="4" placeholder="How can we help?" required></textarea>
 
-        <button type="submit" class="gradient-btn" id="sendBtn">
-            Send Message <i class="fas fa-paper-plane" style="margin-left: 8px;"></i>
-        </button>
-    </form>
+    <button type="submit" class="gradient-btn" id="sendBtn">
+        Send Message <i class="fas fa-paper-plane" style="margin-left: 8px;"></i>
+    </button>
+</form>
+
 </div>
 
         </div>
