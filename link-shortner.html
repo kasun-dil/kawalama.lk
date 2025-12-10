@@ -393,6 +393,45 @@
         updateIcons(next);
     });
     
+
+     // FIXED HEADER SCRIPT
+        let lastScrollTop = 0;
+        const header = document.getElementById('mainHeader');
+        
+        window.addEventListener('scroll', () => {
+            // Get current scroll position
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // 1. MOBILE BOUNCE FIX: 
+            // If scrollTop is negative (pulling top of page on Mobile), treat it as 0
+            if (scrollTop < 0) {
+                scrollTop = 0;
+            }
+
+            // 2. TOP BUFFER FIX: 
+            // If near the top (less than 50px), ALWAYS show navbar.
+            // This prevents it from disappearing when you hit the top.
+            if (scrollTop < 50) {
+                header.classList.remove('hidden');
+                header.classList.remove('scrolled');
+            } 
+            else {
+                // We are further down the page
+                // Logic: Scroll Down -> Hide, Scroll Up -> Show
+                if(scrollTop > lastScrollTop) {
+                    // Scrolling Down
+                    header.classList.add('hidden');
+                } else {
+                    // Scrolling Up
+                    header.classList.remove('hidden');
+                    header.classList.add('scrolled');
+                }
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
+        
     // --- UI LOGIC ---
     document.getElementById('year').textContent = new Date().getFullYear();
 
