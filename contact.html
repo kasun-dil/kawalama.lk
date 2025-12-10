@@ -381,28 +381,44 @@
         });
 
         // Header Scroll Logic - HIDE ON SCROLL DOWN
-        let lastScrollTop = 0;
+        
+
+         let lastScrollTop = 0;
         const header = document.getElementById('mainHeader');
         
         window.addEventListener('scroll', () => {
+            // Get current scroll position
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             
-            // If scrolling DOWN, hide the header
-            if(scrollTop > lastScrollTop){ 
-                header.classList.add('hidden'); 
-            } 
-            // If scrolling UP, show the header
-            else { 
-                header.classList.remove('hidden'); 
-                header.classList.add('scrolled'); 
+            // 1. MOBILE BOUNCE FIX: 
+            // If scrollTop is negative (pulling top of page on Mobile), treat it as 0
+            if (scrollTop < 0) {
+                scrollTop = 0;
             }
-            
-            // If at the very top, remove glass effect
-            if(scrollTop <= 0) header.classList.remove('scrolled');
+
+            // 2. TOP BUFFER FIX: 
+            // If near the top (less than 50px), ALWAYS show navbar.
+            // This prevents it from disappearing when you hit the top.
+            if (scrollTop < 50) {
+                header.classList.remove('hidden');
+                header.classList.remove('scrolled');
+            } 
+            else {
+                // We are further down the page
+                // Logic: Scroll Down -> Hide, Scroll Up -> Show
+                if(scrollTop > lastScrollTop) {
+                    // Scrolling Down
+                    header.classList.add('hidden');
+                } else {
+                    // Scrolling Up
+                    header.classList.remove('hidden');
+                    header.classList.add('scrolled');
+                }
+            }
             
             lastScrollTop = scrollTop;
         });
-
+        
         // Form Animation
         const form = document.getElementById('modernForm');
         const btn = document.getElementById('sendBtn');
