@@ -6,7 +6,6 @@
     <title>Kawalama.lk - Short Link</title>
     
     <link rel="shortcut icon" href="https://i.ibb.co/S4VbCBpM/Untitled-design-6.png" type="image/png">
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     
     <script>
@@ -20,8 +19,8 @@
             /* 1. BRAND COLORS */
             --logo-blue: #3b82f6; 
             --brand-text-color: #1e293b;
+            
             /* 2. SITE THEME - LIGHT MODE */
-            /* Animated Background Gradient Colors */
             --bg-gradient: linear-gradient(135deg, #e7fced, #d0fadf, #aff8c9, #f0fdf4);
             
             --card-bg: #ffffff;
@@ -31,6 +30,10 @@
             --shadow-color: rgba(0, 0, 0, 0.05);
             --input-bg: #f8fafc;
             
+            /* Glass Header Colors (Light) */
+            --header-bg: rgba(255, 255, 255, 0.6);
+            --header-border: rgba(0, 0, 0, 0.05);
+            
             /* Green Button Gradient */
             --btn-grad: linear-gradient(135deg, #10b981 0%, #34d399 50%, #10b981 100%);
             --btn-text: #ffffff;
@@ -39,7 +42,6 @@
 
         [data-theme="dark"] {
             /* SITE THEME - DARK MODE */
-            /* Deep Moving Gradient */
             --bg-gradient: linear-gradient(135deg, #020617, #064e3b, #065f46, #020617);
             
             --card-bg: #0f172a; 
@@ -49,6 +51,10 @@
             --border-color: rgba(255, 255, 255, 0.1);
             --shadow-color: rgba(0, 0, 0, 0.4);
             --input-bg: #1e293b;
+
+            /* Glass Header Colors (Dark) */
+            --header-bg: rgba(2, 6, 23, 0.6);
+            --header-border: rgba(255, 255, 255, 0.05);
             
             /* Dark Mode Button Gradient */
             --btn-grad: linear-gradient(135deg, #059669 0%, #10b981 50%, #059669 100%);
@@ -57,15 +63,12 @@
         }
 
         /* --- ANIMATIONS --- */
-        
-        /* 1. Background Flow */
         @keyframes glowingBackground {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
-        /* 2. Content Slide Up */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
@@ -77,30 +80,62 @@
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg-gradient);
-            background-size: 300% 300%; /* Important for animation */
-            animation: glowingBackground 15s ease infinite; /* The background animation */
+            background-size: 300% 300%;
+            animation: glowingBackground 15s ease infinite;
             color: var(--text-main);
             display: flex;
-            flex-direction: column; /* FIX ADDED HERE: Ensures Footer stacks below Card */
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            padding-top: 80px; /* Added padding to prevent content hiding behind fixed header */
         }
 
-        /* --- FIXED HEADER ELEMENTS --- */
-        .site-branding {
+        /* --- SMART GLASS HEADER --- */
+        .main-header {
             position: fixed;
-            top: 25px;
-            left: 25px;
-            z-index: 100;
-            text-align: left;
-            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 20px 25px;
+            transition: transform 0.4s ease, background-color 0.4s ease, backdrop-filter 0.4s ease, padding 0.4s ease;
+            
+            /* Default Transparent State */
+            background: transparent;
+            backdrop-filter: blur(0px);
+            border-bottom: 1px solid transparent;
         }
-        
-        .site-branding a { text-decoration: none; display: block; }
 
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px; /* Limits width on large screens */
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Scrolled State (Glass Effect) */
+        .main-header.scrolled {
+            background: var(--header-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--header-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+            padding: 12px 25px; /* Shrinks slightly */
+        }
+
+        /* Hidden State (Scroll Down) */
+        .main-header.hidden {
+            transform: translateY(-100%);
+        }
+
+        /* Branding Styles inside Header */
+        .site-branding a { text-decoration: none; display: block; }
+        
         .brand-text h1 {
             font-size: 24px; 
             font-weight: 800; 
@@ -116,23 +151,21 @@
             font-weight: 500;
         }
 
-        /* Theme Toggle */
+        /* Theme Toggle inside Header */
         .theme-toggle {
-            position: fixed;
-            top: 25px;
-            right: 25px;
             width: 44px; height: 44px;
             border-radius: 50%;
-            background: var(--card-bg);
+            background: transparent; /* Blends with header */
             border: 1px solid var(--border-color);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer;
             color: var(--text-main);
-            box-shadow: 0 4px 12px var(--shadow-color);
-            z-index: 100;
-            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            transition: transform 0.2s ease, background 0.3s ease;
         }
-        .theme-toggle:hover { transform: scale(1.1); }
+        .theme-toggle:hover { 
+            transform: scale(1.1); 
+            background: var(--input-bg);
+        }
         .theme-toggle svg { width: 20px; height: 20px; stroke-width: 2; }
 
 
@@ -147,8 +180,6 @@
             text-align: center;
             border: 1px solid var(--border-color);
             position: relative;
-            
-            /* Entry Animation */
             animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s forwards;
             opacity: 0;
         }
@@ -212,10 +243,8 @@
         button.main-btn {
             width: 100%;
             padding: 18px;
-            /* Animated Gradient Background */
             background-image: var(--btn-grad);
             background-size: 200% auto;
-            
             color: var(--btn-text);
             border: none;
             border-radius: 14px;
@@ -226,9 +255,9 @@
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         button.main-btn:hover { 
-            background-position: right center; /* Shifts the gradient */
-            transform: translateY(-3px); /* Lifts up */
-            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4); /* Glow increases */
+            background-position: right center;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4);
         }
         button.main-btn:active { transform: scale(0.98); }
 
@@ -285,7 +314,6 @@
 
         .btn-copy { background: #e2e8f0; color: #1e293b; }
         [data-theme="dark"] .btn-copy { background: #334155; color: white; }
-        
         .btn-copy:hover { transform: translateY(-2px); opacity: 0.9; }
 
         .btn-test { 
@@ -298,48 +326,43 @@
 
         /* Footer */
         footer {
-            position: fixed;
-            bottom: 20px;
-            width: 100%;
+            margin-top: auto;
+            padding-bottom: 20px;
             text-align: center;
             font-size: 13px;
             color: var(--text-muted);
             opacity: 0.7;
-            pointer-events: none;
             animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         @media (max-width: 768px) {
-            body { align-items: flex-start; padding-top: 120px; }
+            body { align-items: flex-start; padding-top: 100px; }
             .container-card { padding: 2rem; }
-            
-            /* FIX ADDED HERE: Pushes footer to bottom on mobile */
-            footer { 
-                position: relative; 
-                bottom: auto; 
-                margin-top: auto; 
-                padding-bottom: 20px; 
-            }
+            .main-header { padding: 15px 20px; }
         }
     </style>
 </head>
 <body>
 
-<div class="site-branding">
-    <a href="dashboard.html">
-        <div class="brand-text">
-            <h1>Kawalama<span>.lk</span></h1>
-            <div class="subtitle">Fast Link Shortener</div>
+<header id="mainHeader" class="main-header">
+    <div class="header-content">
+        <div class="site-branding">
+            <a href="dashboard.html">
+                <div class="brand-text">
+                    <h1>Kawalama<span>.lk</span></h1>
+                    <div class="subtitle">Fast Link Shortener</div>
+                </div>
+            </a>
         </div>
-    </a>
-</div>
 
-<div id="themeToggle" class="theme-toggle" aria-label="Switch Theme">
-    <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-    <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-</div>
+        <div id="themeToggle" class="theme-toggle" aria-label="Switch Theme">
+            <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </div>
+    </div>
+</header>
 
 <div class="container-card">
     <h2>Link Shortener</h2>
@@ -392,24 +415,27 @@
         localStorage.setItem('theme', next);
         updateIcons(next);
     });
-    
-let lastScrollTop = 0;
+
+    // --- SMART GLASS HEADER LOGIC ---
+    let lastScrollTop = 0;
     const header = document.getElementById('mainHeader');
 
     window.addEventListener('scroll', function() {
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
-        if (scrollTop > lastScrollTop) {
-            // Down = Hide
+        // 1. Add "Scrolled" class for Glass Effect
+        if (scrollTop > 20) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+
+        // 2. Hide/Show on Scroll Direction
+        if (scrollTop > lastScrollTop && scrollTop > 100) {
+            // Scrolling Down -> Hide
             header.classList.add('hidden');
         } else {
-            // Up = Show
-            header.classList.remove('hidden');
-            header.classList.add('scrolled');
-        }
-        
-        if (scrollTop <= 0) {
-            header.classList.remove('scrolled');
+            // Scrolling Up -> Show
             header.classList.remove('hidden');
         }
         
