@@ -425,7 +425,7 @@
         
         toggleBtn.addEventListener('click', () => {
             const current = htmlEl.getAttribute('data-theme');
-            const next = current === 'dark' ? 'light' : 'dark';
+            const next = current === 'light' ? 'dark' : 'light';
             htmlEl.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
         });
