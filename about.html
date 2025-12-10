@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - Kawalama.lk</title>
     
-  <link rel="icon" sizes="any" href="data:,">
+    <link rel="icon" sizes="any" href="data:,">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -24,8 +24,8 @@
             --theme-accent: #d946ef; 
             --logo-color: #1e293b;
 
-            /* Light Mode Background Gradient */
-            --bg-gradient-light: linear-gradient(-45deg, #e0c3fc, #a7d3ff, #d0a4fc, #f7b2d8);
+            /* FIXED: Unified Gradient Variable (Light Mode Default) */
+            --bg-gradient: linear-gradient(-45deg, #e0c3fc, #a7d3ff, #d0a4fc, #f7b2d8);
             
             /* Glass Variables */
             --glass-surface: rgba(255, 255, 255, 0.6);
@@ -44,8 +44,8 @@
         }
 
         [data-theme="dark"] {
-            /* Dark Mode Background Gradient */
-            --bg-gradient-dark: linear-gradient(-45deg, #0f172a, #2e1065, #4c0519, #1e1b4b);
+            /* FIXED: Update Gradient Variable for Dark Mode */
+            --bg-gradient: linear-gradient(-45deg, #0f172a, #2e1065, #4c0519, #1e1b4b);
 
             /* Glass Variables (Dark) */
             --glass-surface: rgba(15, 23, 42, 0.6);
@@ -66,12 +66,6 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            
-            /* --- FIXED GRADIENT ANIMATION --- */
-            background: var(--bg-gradient-light);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -79,12 +73,24 @@
             overflow-x: hidden;
             padding-top: 80px; 
             position: relative; 
+            
+            /* FIXED: Ensure content sits above the background layer */
+            z-index: 1; 
         }
 
-        [data-theme="dark"] body {
-            background: var(--bg-gradient-dark);
+        /* --- FIXED: MOBILE BACKGROUND SOLUTION --- */
+        body::before {
+            content: "";
+            position: fixed; /* Stays fixed during scroll */
+            top: 0; left: 0;
+            width: 100%; height: 100vh;
+            z-index: -2; /* Behind everything */
+            
+            background-image: var(--bg-gradient);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
+            
+            will-change: background-position; /* Optimization */
         }
 
         /* --- THE ANIMATION KEYFRAMES --- */
@@ -102,6 +108,7 @@
             opacity: 0.4;
             z-index: -1;
             animation: floatGlow 15s infinite alternate;
+            transform: translateZ(0); /* Hardware accel */
         }
         .glow-1 {
             top: -10%; left: -10%; width: 700px; height: 700px;
@@ -129,10 +136,10 @@
         .smart-header {
             position: fixed; top: 0; left: 0; width: 100%; height: 80px;
             padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
-            z-index: 1000; transition: 0.4s;
+            z-index: 1000; transition: transform 0.3s ease-in-out, background 0.3s;
         }
         .smart-header.scrolled {
-            background: rgba(var(--bg-color), 0.2); 
+            background: rgba(var(--logo-color), 0.05); 
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--glass-border);
@@ -142,7 +149,6 @@
         .brand-text { text-decoration: none; }
         .brand-text h1 { font-size: 24px; font-weight: 800; margin: 0; color: var(--logo-color); }
         
-        /* --- FIXED: LOGO .LK IS BLUE --- */
         .brand-text span { 
             color: #3b82f6; /* Solid Blue Color */
         }
@@ -616,40 +622,34 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Smart Header Logic (Hides on Scroll Down)
+        // FIXED NAVBAR SCRIPT (Mobile Compatible)
         let lastScrollTop = 0;
         const header = document.getElementById('mainHeader');
         
         window.addEventListener('scroll', () => {
-            // Get current scroll position
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             
-            // 1. MOBILE BOUNCE FIX: 
-            // If scrollTop is negative (pulling top of page on Mobile), treat it as 0
+            // 1. IGNORE NEGATIVE SCROLL (Mobile Bounce)
             if (scrollTop < 0) {
                 scrollTop = 0;
             }
 
-            // 2. TOP BUFFER FIX: 
-            // If near the top (less than 50px), ALWAYS show navbar.
-            // This prevents it from disappearing when you hit the top.
+            // 2. ALWAYS SHOW NEAR TOP (Buffer Zone)
             if (scrollTop < 50) {
                 header.classList.remove('hidden');
                 header.classList.remove('scrolled');
             } 
             else {
-                // We are further down the page
-                // Logic: Scroll Down -> Hide, Scroll Up -> Show
+                // Scroll Down -> Hide
                 if(scrollTop > lastScrollTop) {
-                    // Scrolling Down
                     header.classList.add('hidden');
-                } else {
-                    // Scrolling Up
+                } 
+                // Scroll Up -> Show
+                else {
                     header.classList.remove('hidden');
                     header.classList.add('scrolled');
                 }
             }
-            
             lastScrollTop = scrollTop;
         });
 
