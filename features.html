@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Features - Kawalama.lk</title>
     
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,8 +21,9 @@
             --theme-accent: #d946ef; 
             --logo-color: #1e293b;
 
-            /* Light Mode Background Gradient */
-            --bg-gradient-light: linear-gradient(-45deg, #e0c3fc, #a7d3ff, #d0a4fc, #f7b2d8);
+            /* FIXED: Consolidated Background Logic */
+            /* Default (Light) Gradient */
+            --current-bg-gradient: linear-gradient(-45deg, #e0c3fc, #a7d3ff, #d0a4fc, #f7b2d8);
             
             /* Glass Variables */
             --glass-surface: rgba(255, 255, 255, 0.6);
@@ -42,8 +42,8 @@
         }
 
         [data-theme="dark"] {
-            /* Dark Mode Background Gradient */
-            --bg-gradient-dark: linear-gradient(-45deg, #0f172a, #2e1065, #4c0519, #1e1b4b);
+            /* FIXED: Update the variable instead of creating a new one */
+            --current-bg-gradient: linear-gradient(-45deg, #0f172a, #2e1065, #4c0519, #1e1b4b);
 
             /* Glass Variables (Dark) */
             --glass-surface: rgba(15, 23, 42, 0.6);
@@ -64,8 +64,15 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-gradient-light);
+            
+            /* FIXED: Use standard background-image property & fallback color */
+            background-color: var(--text-main); /* Fallback */
+            background-image: var(--current-bg-gradient);
             background-size: 400% 400%;
+            
+            /* FIXED: Explicitly set attachment to scroll for Mobile performance */
+            background-attachment: scroll; 
+            
             animation: gradientBG 15s ease infinite;
             color: var(--text-main);
             min-height: 100vh;
@@ -76,11 +83,8 @@
             position: relative; 
         }
 
-        [data-theme="dark"] body {
-            background: var(--bg-gradient-dark);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
+        /* FIXED: Removed duplicate [data-theme="dark"] body rule. 
+           The variable switch in :root handles it now. */
 
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
@@ -96,6 +100,9 @@
             opacity: 0.4;
             z-index: -1;
             animation: floatGlow 15s infinite alternate;
+            
+            /* FIXED: Add transform: translateZ(0) to force hardware acceleration on mobile */
+            transform: translateZ(0);
         }
         .glow-1 { top: -10%; left: -10%; width: 700px; height: 700px; background: radial-gradient(circle, #d946ef, #8b5cf6); }
         .glow-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, #3b82f6, #06b6d4); }
@@ -109,12 +116,13 @@
         .smart-header {
             position: fixed; top: 0; left: 0; width: 100%; height: 80px;
             padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
-            z-index: 1000; transition: 0.4s;
+            z-index: 1000; transition: transform 0.3s ease-in-out, background 0.3s; /* Smoother transition */
         }
         .smart-header.scrolled {
             background: rgba(var(--bg-color), 0.2); 
-            backdrop-filter: blur(16px);
+            /* FIXED: Added webkit prefix for Safari Blur */
             -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--glass-border);
         }
         .smart-header.hidden { transform: translateY(-100%); }
@@ -163,8 +171,9 @@
         /* --- FEATURE GLASS CARD --- */
         .feature-card {
             background: var(--glass-surface);
-            backdrop-filter: blur(15px);
+            /* FIXED: Webkit prefix for Safari glass effect */
             -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
             border: 1px solid var(--glass-border);
             border-radius: 24px;
             padding: 30px;
@@ -219,6 +228,7 @@
         /* --- FOOTER --- */
         .simple-footer {
             background: rgba(0, 0, 0, 0.2);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
             padding: 20px 0;
             margin-top: auto;
@@ -372,14 +382,40 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Header Hide Script
+        // FIXED HEADER SCRIPT
         let lastScrollTop = 0;
         const header = document.getElementById('mainHeader');
+        
         window.addEventListener('scroll', () => {
+            // Get current scroll position
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            if(scrollTop > lastScrollTop){ header.classList.add('hidden'); }
-            else { header.classList.remove('hidden'); header.classList.add('scrolled'); }
-            if(scrollTop <= 0) header.classList.remove('scrolled');
+            
+            // 1. MOBILE BOUNCE FIX: 
+            // If scrollTop is negative (pulling top of page on Mobile), treat it as 0
+            if (scrollTop < 0) {
+                scrollTop = 0;
+            }
+
+            // 2. TOP BUFFER FIX: 
+            // If near the top (less than 50px), ALWAYS show navbar.
+            // This prevents it from disappearing when you hit the top.
+            if (scrollTop < 50) {
+                header.classList.remove('hidden');
+                header.classList.remove('scrolled');
+            } 
+            else {
+                // We are further down the page
+                // Logic: Scroll Down -> Hide, Scroll Up -> Show
+                if(scrollTop > lastScrollTop) {
+                    // Scrolling Down
+                    header.classList.add('hidden');
+                } else {
+                    // Scrolling Up
+                    header.classList.remove('hidden');
+                    header.classList.add('scrolled');
+                }
+            }
+            
             lastScrollTop = scrollTop;
         });
 
