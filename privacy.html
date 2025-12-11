@@ -173,7 +173,7 @@
             <div class="footer-links">
                 <a href="index.html">Home</a>
                 <a href="about.html">Privacy Policy</a>
-                <a href="terms.html">Terms of Use</a>
+                <a href="terms.html">Terms</a>
                 <a href="contact.html">Contact</a>
             </div>
         </div>
@@ -181,12 +181,29 @@
 
     <script>
         // Header Logic
-        let lastScrollTop = 0; const header = document.getElementById('mainHeader');
+        let lastScrollTop = 0;
+        const header = document.getElementById('mainHeader');
+        
         window.addEventListener('scroll', () => {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            if(scrollTop > lastScrollTop){ header.classList.add('hidden'); }
-            else { header.classList.remove('hidden'); header.classList.add('scrolled'); }
-            if(scrollTop <= 0) header.classList.remove('scrolled');
+            if (scrollTop < 0) {
+                scrollTop = 0;
+            }
+
+            if (scrollTop < 50) {
+                header.classList.remove('hidden');
+                header.classList.remove('scrolled');
+            } 
+            else {
+                if(scrollTop > lastScrollTop) {
+                    // Scrolling Down
+                    header.classList.add('hidden');
+                } else {
+                    // Scrolling Up
+                    header.classList.remove('hidden');
+                    header.classList.add('scrolled');
+                }
+            }
             lastScrollTop = scrollTop;
         });
         // Theme Logic
