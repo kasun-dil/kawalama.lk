@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hire Us - Kawalama.lk</title>
     
     <link rel="icon" sizes="any" href="data:,">    
@@ -18,11 +18,15 @@
     <style>
         /* --- VARIABLES --- */
         :root {
+            color-scheme: light; 
+
             --brand-blue: #3b82f6; 
             --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #d946ef 100%);
-            --glass-surface: rgba(255, 255, 255, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --input-bg: rgba(255, 255, 255, 0.5);
+            
+            /* Light Mode Colors */
+            --glass-surface: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --input-bg: rgba(255, 255, 255, 0.8);
             --text-main: #1e293b;
             --text-muted: #475569;
             --glow-color: rgba(139, 92, 246, 0.4);
@@ -36,9 +40,11 @@
         }
 
         [data-theme="dark"] {
-            --glass-surface: rgba(15, 23, 42, 0.5);
+            color-scheme: dark;
+
+            --glass-surface: rgba(15, 23, 42, 0.6);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --input-bg: rgba(30, 41, 59, 0.5);
+            --input-bg: rgba(30, 41, 59, 0.6);
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
             --glow-color: rgba(139, 92, 246, 0.6);
@@ -112,12 +118,29 @@
         }
         .hero-desc { font-size: 1.2rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 30px; }
 
-        /* --- SERVICES GRID --- */
+        /* --- SERVICES GRID (FIXED FOR 1 LINE ON PC) --- */
         .services-section {
             max-width: 1200px; margin: 0 auto 80px; padding: 0 20px;
         }
         .grid-container {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;
+            display: grid; 
+            gap: 30px;
+            /* Default: Mobile (1 Column) */
+            grid-template-columns: 1fr;
+        }
+
+        /* TABLET: 2 Columns */
+        @media (min-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* PC / LAPTOP: Force 3 Columns in One Line */
+        @media (min-width: 1024px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
         
         .service-card {
@@ -125,6 +148,7 @@
             border: 1px solid var(--glass-border); border-radius: 24px; padding: 35px;
             transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: center; /* Center content vertically */
         }
         .service-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px -10px var(--glow-color); }
         .service-card::after {
@@ -191,19 +215,22 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.2); position: relative;
         }
         
+        /* INPUT STYLES */
         .modern-input, .modern-select {
-            width: 100%; background: var(--input-bg);
+            width: 100%; 
+            background: var(--input-bg);
             border: 1px solid var(--glass-border); padding: 15px 20px;
             border-radius: 12px; font-size: 1rem;
             transition: 0.3s; margin-bottom: 20px;
-            color: var(--text-main); 
+            color: var(--text-main);
+            -webkit-appearance: none; appearance: none; 
         }
         
-        .modern-select option { background: #1e293b; color: white; }
-        [data-theme="light"] .modern-select option { background: #ffffff; color: #333; }
+        .modern-select option { background-color: #ffffff; color: #333333; }
+        [data-theme="dark"] .modern-select option { background-color: #1e293b; color: #ffffff; }
 
         .modern-input:focus, .modern-select:focus {
-            outline: none; background: rgba(var(--bg-color), 0.8);
+            outline: none; background: rgba(var(--bg-color), 0.9);
             border-color: #8b5cf6; box-shadow: 0 0 0 4px var(--glow-color);
         }
         
@@ -240,6 +267,7 @@
         @media (max-width: 900px) {
             .split-layout { grid-template-columns: 1fr; gap: 40px; }
             .hero-title { font-size: 2.5rem; }
+            .glass-form { padding: 25px; } 
         }
     </style>
 </head>
@@ -262,7 +290,6 @@
         <p class="hero-desc">
             Kawalama.lk is on a mission to help you bring your ideas to life. From creating comprehensive digital solutions to simple tools, we do it all.
             We specialize in crafting scalable web applications, React Native mobile apps, and visually appealing sites optimized for SEO and performance.
-            Let's build something extraordinary together.
         </p>
     </div>
 
@@ -271,19 +298,19 @@
             <div class="service-card">
                 <div class="service-icon"><i class="fas fa-code"></i></div>
                 <h3>Web Development</h3>
-                <p>Modern, responsive, and fast websites built with React, Node.js, and cutting-edge technologies. We specialize in creating scalable web applications and e-commerce platforms ensuring your online presence is robust and effective.</p>
+                <p>Modern, responsive, and fast websites built with React, Node.js, and cutting-edge technologies.</p>
             </div>
             
             <div class="service-card">
                 <div class="service-icon"><i class="fas fa-mobile-alt"></i></div>
                 <h3>Mobile Apps</h3>
-                <p>Cross-platform mobile applications for iOS and Android using frameworks like Flutter and React Native. We deliver smooth user experiences, robust functionality, and intuitive designs that keep your users engaged.</p>
+                <p>Cross-platform mobile applications for iOS and Android using frameworks like Flutter and React Native.</p>
             </div>
 
             <div class="service-card">
                 <div class="service-icon"><i class="fas fa-layer-group"></i></div>
                 <h3>UI/UX Design</h3>
-                <p>Stunning interfaces and intuitive user experiences are at the core of our design philosophy. We conduct thorough user research and create wireframes that users love to interact with, enhancing brand loyalty.</p>
+                <p>Stunning interfaces and intuitive user experiences are at the core of our design philosophy.</p>
             </div>
         </div>
     </div>
@@ -297,31 +324,22 @@
             
             <div class="contact-info-box">
                 <div class="contact-subtitle">
-                    We're here to help you bring your ideas to life. Reach out to us for inquiries, collaborations, or just to say hello. Our team is ready to assist you.
+                    We're here to help you bring your ideas to life. Reach out to us for inquiries, collaborations, or just to say hello.
                 </div>
 
                 <div class="info-item">
                     <div class="info-icon"><i class="fas fa-envelope"></i></div>
-                    <div class="info-text">
-                        <h5>Email:</h5>
-                        <p>contact@kawalama.lk</p>
-                    </div>
+                    <div class="info-text"><h5>Email:</h5><p>contact@kawalama.lk</p></div>
                 </div>
 
                 <div class="info-item">
                     <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
-                    <div class="info-text">
-                        <h5>Phone:</h5>
-                        <p>+94 70 370 4224</p>
-                    </div>
+                    <div class="info-text"><h5>Phone:</h5><p>+94 70 370 4224</p></div>
                 </div>
 
                 <div class="info-item">
                     <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
-                    <div class="info-text">
-                        <h5>Address:</h5>
-                        <p>Galle, Sri Lanka.</p>
-                    </div>
+                    <div class="info-text"><h5>Address:</h5><p>Galle, Sri Lanka.</p></div>
                 </div>
 
                 <div class="social-links">
@@ -419,20 +437,26 @@
             localStorage.setItem('theme', next);
         });
 
-        // Smart Header Logic
+        // HEADER SCROLL LOGIC
         let lastScrollTop = 0;
         const header = document.getElementById('mainHeader');
         
         window.addEventListener('scroll', () => {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            if (scrollTop < 0) scrollTop = 0;
+            if (scrollTop < 0) {
+                scrollTop = 0;
+            }
+
             if (scrollTop < 50) {
                 header.classList.remove('hidden');
                 header.classList.remove('scrolled');
-            } else {
+            } 
+            else {
                 if(scrollTop > lastScrollTop) {
+                    // Scrolling Down
                     header.classList.add('hidden');
                 } else {
+                    // Scrolling Up
                     header.classList.remove('hidden');
                     header.classList.add('scrolled');
                 }
@@ -449,38 +473,34 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent reload
             
-            // 1. Loading State
             const originalContent = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
             btn.disabled = true;
             btn.style.opacity = '0.8';
 
-            // 2. Send Data
             fetch(form.action, {
                 method: "POST",
                 body: new FormData(form),
                 headers: { 'Accept': 'application/json' }
             })
             .then(response => {
-                // 3. Success -> Switch Views
+                // Success -> Switch Views
                 formView.style.display = 'none';
                 successView.style.display = 'block';
 
-                // Reset Button for next time
                 btn.innerHTML = originalContent;
                 btn.disabled = false;
                 btn.style.opacity = '1';
                 form.reset();
             })
             .catch(error => {
-                alert("Connection Failed. Please check your internet.");
+                alert("Connection Failed. Please check internet.");
                 btn.innerHTML = originalContent;
                 btn.disabled = false;
                 btn.style.opacity = '1';
             });
         });
 
-        // Function to close success msg and show form again
         function resetForm() {
             successView.style.display = 'none';
             formView.style.display = 'block';
